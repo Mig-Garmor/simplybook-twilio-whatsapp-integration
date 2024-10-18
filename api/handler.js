@@ -55,10 +55,10 @@ async function getBookingDetails(
   return response.json(); // Return the booking details JSON response
 }
 
-export default async function handler(req, res) {
+export default async function handler(req) {
   if (req.method === "POST") {
     try {
-      const { bookingId, bookingHash } = req.body; // Get bookingId and bookingHash from the request body
+      const { bookingId, bookingHash } = await req.json(); // Get bookingId and bookingHash from the request body
 
       const simplybookApiKey = process.env.SIMPLYBOOK_API_KEY; // Your SimplyBook API key
       const companyLogin = process.env.SIMPLYBOOK_COMPANY_LOGIN || "migar"; // Your SimplyBook company login
@@ -76,21 +76,45 @@ export default async function handler(req, res) {
       );
 
       // Step 3: Return the booking details to the client
-      return res.status(200).json({
-        message: "Success",
-        bookingDetails,
-      });
+      return new Response(
+        JSON.stringify({
+          message: "Success",
+          bookingDetails,
+        }),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
     } catch (error) {
       // Handle errors and return appropriate response
       console.error("Error:", error);
-      return res.status(500).json({
-        error: error.message,
-      });
+      return new Response(
+        JSON.stringify({
+          error: error.message,
+        }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
     }
   } else {
-    return res.status(405).json({
-      error: "Method not allowed",
-    });
+    return new Response(
+      JSON.stringify({
+        error: "Method not allowed",
+      }),
+      {
+        status: 405,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
   }
 }
 
