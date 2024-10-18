@@ -100,8 +100,8 @@ export default async function handler(req) {
       const body = await req.json();
       console.log("Received POST request: ", body);
 
-      const bookingId = body.bookingId;
-      const bookingHash = body.bookingHash;
+      const bookingId = body.booking_id;
+      const bookingHash = body.booking_hash;
 
       // const { bookingId, bookingHash } = await req.json(); // Get bookingId and bookingHash from the request body
 
