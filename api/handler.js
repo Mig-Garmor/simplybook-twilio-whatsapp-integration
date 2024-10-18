@@ -4,7 +4,7 @@ export default async function handler(req) {
       const { bookingId } = await req.json(); // Assume bookingId is sent in the POST request
 
       // Call Simplybook.me API to get booking details
-      const simplybookApiUrl = `https://user-api-v2.simplybook.it/getBookingDetails`;
+      const simplybookApiUrl = `https://user-api.simplybook.me/getBookingDetails`;
       const simplybookApiKey = process.env.SIMPLYBOOK_API_KEY; // Store API key in Vercel environment variables
 
       const response = await fetch(simplybookApiUrl, {
