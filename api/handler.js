@@ -1,3 +1,5 @@
+import md5 from "js-md5"; // Import the MD5 hashing function from the library
+
 export default async function handler(req) {
   if (req.method === "POST") {
     try {
@@ -9,10 +11,7 @@ export default async function handler(req) {
       const simplybookApiKey = process.env.SIMPLYBOOK_API_KEY; // Store API key in Vercel environment variables
 
       // Create the MD5 hash (sign parameter)
-      const sign = crypto
-        .createHash("md5")
-        .update(bookingId + bookingHash + simplybookApiKey)
-        .digest("hex");
+      const sign = md5(bookingId + bookingHash + simplybookApiKey);
 
       const response = await fetch(simplybookApiUrl, {
         method: "POST",

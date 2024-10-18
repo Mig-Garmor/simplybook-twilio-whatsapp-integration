@@ -2,8 +2,11 @@
   "name": "vercel-edge-function",
   "version": "1.0.0",
   "scripts": {
-    "dev": "vercel dev",     
-    "build": "",             
+    "dev": "vercel dev",
+    "build": "",
     "start": "vercel dev"
+  },
+  "dependencies": {
+    "js-md5": "^0.8.3"
   }
 }
