@@ -57,11 +57,11 @@ async function sendJsonRpcRequest(method, params, headers = {}, endpoint = "") {
 // Function to get the token using the login endpoint (Client Authorization)
 async function getToken(companyLogin, publicKey) {
   // Use the login endpoint explicitly for token retrieval
-  const loginUrl = "https://user-api.simplybook.it/login";
+  const loginUrl = `${process.env.SIMPLEBOOK_API_URL}/login`;
 
   const params = {
-    company_login: companyLogin,
-    api_key: publicKey, // Use public key (API key)
+    companyLogin,
+    publicKey,
   };
 
   return await sendJsonRpcRequest("getToken", params, {}, loginUrl); // Send request to the /login endpoint to get the token
