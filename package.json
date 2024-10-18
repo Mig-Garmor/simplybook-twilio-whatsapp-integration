@@ -1,18 +1,20 @@
 {
   "name": "simplybook-twilio-whatsapp-integration",
   "version": "1.0.0",
-  "description": "",
+  "description": "Simplybook.me webhook integration with Twilio for WhatsApp messaging.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "body-parser": "^1.20.3",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "twilio": "^5.3.4"
-  }
+    "express": "^4.17.1",
+    "body-parser": "^1.19.0",
+    "twilio": "^3.60.0",
+    "dotenv": "^8.2.0"
+  },
+  "engines": {
+    "node": "14.x"
+  },
+  "author": "Your Name",
+  "license": "MIT"
 }
