@@ -11,7 +11,7 @@ function generateUniqueId() {
 
 // Function to send a JSON-RPC request to SimplyBook.me
 async function sendJsonRpcRequest(method, params) {
-  const simplybookApiUrl = `https://user-api.simplybook.it/`; // Correct JSON-RPC API endpoint
+  const simplybookApiUrl = process.SIMPLYBOOK_API_URL; // Correct JSON-RPC API endpoint
   const uniqueId = generateUniqueId(); // Generate unique ID for the request
 
   console.log(
@@ -50,7 +50,7 @@ async function sendJsonRpcRequest(method, params) {
   return data.result; // Return the result from the response
 }
 
-// Function to get the token using JSON-RPC
+// Function to get the token using JSON-RPC (Client Authorization)
 async function getToken(companyLogin, apiKey) {
   // JSON-RPC call to get the token
   const params = {
@@ -58,7 +58,7 @@ async function getToken(companyLogin, apiKey) {
     api_key: apiKey,
   };
 
-  return await sendJsonRpcRequest("getToken", params);
+  return await sendJsonRpcRequest("getToken", params); // Get the token using the company's login and API key
 }
 
 // Function to get booking details using the token and JSON-RPC
@@ -69,7 +69,7 @@ async function getBookingDetails(
   bookingHash,
   apiKey
 ) {
-  // Create MD5 hash for signing
+  // Create MD5 hash for signing (according to SimplyBook.me authentication process)
   const sign = SparkMD5.hash(bookingId + bookingHash + apiKey);
 
   // JSON-RPC call to get booking details
@@ -81,6 +81,7 @@ async function getBookingDetails(
   return await sendJsonRpcRequest("getBookingDetails", params);
 }
 
+// Handler function for Vercel edge function
 export default async function handler(req) {
   if (req.method === "POST") {
     try {
