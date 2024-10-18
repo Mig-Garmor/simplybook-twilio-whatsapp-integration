@@ -18,14 +18,19 @@ const whatsappNumber = process.env.WHATSAPP_NUMBER;
 
 // Endpoint to receive webhook from Simplybook.me
 app.post("/webhook", (req, res) => {
-  const { clientPhone, eventType, bookingDetails } = req.body;
+  try {
+    console.log("Webhook received:", req.body);
+    const { clientPhone, eventType, bookingDetails } = req.body;
 
-  // Handle new booking event
-  if (eventType === "new_booking") {
-    sendWhatsAppMessage(clientPhone, bookingDetails);
+    if (eventType === "new_booking") {
+      sendWhatsAppMessage(clientPhone, bookingDetails);
+    }
+
+    res.status(200).send("Webhook received");
+  } catch (error) {
+    console.error("Error handling webhook:", error);
+    res.status(500).send("Server error");
   }
-
-  res.status(200).send("Webhook received");
 });
 
 // Function to send WhatsApp message
