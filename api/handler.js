@@ -10,8 +10,9 @@ function generateUniqueId() {
 }
 
 // Function to send a JSON-RPC request to SimplyBook.me
-async function sendJsonRpcRequest(method, params) {
-  const simplybookApiUrl = process.env.SIMPLYBOOK_API_URL; // Correct JSON-RPC API endpoint
+async function sendJsonRpcRequest(method, params, headers = {}) {
+  const simplybookApiUrl =
+    process.env.SIMPLYBOOK_API_URL || "https://user-api.simplybook.it"; // Correct JSON-RPC API endpoint
   const uniqueId = generateUniqueId(); // Generate unique ID for the request
 
   console.log(
@@ -19,10 +20,11 @@ async function sendJsonRpcRequest(method, params) {
     params
   );
 
-  const response = await fetch(simplybookApiUrl, {
+  const response = await fetch(`${simplybookApiUrl}/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...headers, // Include any additional headers (like token authorization)
     },
     body: JSON.stringify({
       jsonrpc: "2.0",
@@ -51,26 +53,26 @@ async function sendJsonRpcRequest(method, params) {
 }
 
 // Function to get the token using JSON-RPC (Client Authorization)
-async function getToken(companyLogin, apiKey) {
+async function getToken(companyLogin, publicKey) {
   // JSON-RPC call to get the token
   const params = {
     company_login: companyLogin,
-    api_key: apiKey,
+    api_key: publicKey, // Use public key (API key)
   };
 
-  return await sendJsonRpcRequest("getToken", params); // Get the token using the company's login and API key
+  return await sendJsonRpcRequest("getToken", params); // Get the token using the company's login and public API key
 }
 
 // Function to get booking details using the token and JSON-RPC
 async function getBookingDetails(
-  companyLogin,
-  token,
   bookingId,
   bookingHash,
-  apiKey
+  secretKey,
+  token,
+  companyLogin
 ) {
   // Create MD5 hash for signing (according to SimplyBook.me authentication process)
-  const sign = SparkMD5.hash(bookingId + bookingHash + apiKey);
+  const sign = SparkMD5.hash(bookingId + bookingHash + secretKey); // Sign using bookingId, bookingHash, and secret key
 
   // JSON-RPC call to get booking details
   const params = {
@@ -78,7 +80,13 @@ async function getBookingDetails(
     sign: sign,
   };
 
-  return await sendJsonRpcRequest("getBookingDetails", params);
+  // Pass the token and company login as headers
+  const headers = {
+    "X-Company-Login": companyLogin,
+    "X-Token": token,
+  };
+
+  return await sendJsonRpcRequest("getBookingDetails", params, headers);
 }
 
 // Handler function for Vercel edge function
@@ -87,23 +95,25 @@ export default async function handler(req) {
     try {
       const { bookingId, bookingHash } = await req.json(); // Get bookingId and bookingHash from the request body
 
-      const simplybookApiKey = process.env.SIMPLYBOOK_API_KEY; // Your SimplyBook API key
-      const companyLogin = process.env.SIMPLYBOOK_COMPANY_LOGIN || "migar"; // Your SimplyBook company login
+      const publicKey = process.env.SIMPLYBOOK_PUBLIC_KEY; // Your SimplyBook public key (API key)
+      const secretKey = process.env.SIMPLYBOOK_SECRET_KEY; // Your SimplyBook secret key
+      const companyLogin =
+        process.env.SIMPLYBOOK_COMPANY_LOGIN || "your_company_login"; // Your SimplyBook company login
 
       console.log("Authenticating to get token...");
 
       // Step 1: Authenticate and get the token via JSON-RPC
-      const token = await getToken(companyLogin, simplybookApiKey);
+      const token = await getToken(companyLogin, publicKey);
 
       console.log("Token received:", token);
 
       // Step 2: Fetch booking details using JSON-RPC
       const bookingDetails = await getBookingDetails(
-        companyLogin,
-        token,
         bookingId,
         bookingHash,
-        simplybookApiKey
+        secretKey,
+        token,
+        companyLogin
       );
 
       // Step 3: Return the booking details to the client
