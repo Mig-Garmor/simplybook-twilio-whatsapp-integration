@@ -6,7 +6,5 @@
     "build": "",
     "start": "vercel dev"
   },
-  "dependencies": {
-    "js-md5": "^0.8.3"
-  }
+  "dependencies": {}
 }

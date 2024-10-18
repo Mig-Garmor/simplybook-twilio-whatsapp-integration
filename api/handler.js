@@ -1,4 +1,4 @@
-import md5 from "js-md5"; // Import the MD5 hashing function from the library
+import crypto from "crypto"; // Built-in Node.js crypto module to generate MD5 hash
 
 export default async function handler(req) {
   if (req.method === "POST") {
@@ -11,7 +11,10 @@ export default async function handler(req) {
       const simplybookApiKey = process.env.SIMPLYBOOK_API_KEY; // Store API key in Vercel environment variables
 
       // Create the MD5 hash (sign parameter)
-      const sign = md5(bookingId + bookingHash + simplybookApiKey);
+      const sign = crypto
+        .createHash("md5")
+        .update(bookingId + bookingHash + secretKey)
+        .digest("hex");
 
       const response = await fetch(simplybookApiUrl, {
         method: "POST",
