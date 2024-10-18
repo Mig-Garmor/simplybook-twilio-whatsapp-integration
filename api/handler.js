@@ -10,9 +10,11 @@ function generateUniqueId() {
 }
 
 // Function to send a JSON-RPC request to SimplyBook.me
-async function sendJsonRpcRequest(method, params, headers = {}) {
+async function sendJsonRpcRequest(method, params, headers = {}, endpoint = "") {
   const simplybookApiUrl =
-    process.env.SIMPLYBOOK_API_URL || "https://user-api.simplybook.it"; // Correct JSON-RPC API endpoint
+    endpoint ||
+    process.env.SIMPLYBOOK_API_URL ||
+    "https://user-api.simplybook.it"; // Correct JSON-RPC API endpoint
   const uniqueId = generateUniqueId(); // Generate unique ID for the request
 
   console.log(
@@ -52,15 +54,17 @@ async function sendJsonRpcRequest(method, params, headers = {}) {
   return data.result; // Return the result from the response
 }
 
-// Function to get the token using JSON-RPC (Client Authorization)
+// Function to get the token using the login endpoint (Client Authorization)
 async function getToken(companyLogin, publicKey) {
-  // JSON-RPC call to get the token
+  // Use the login endpoint explicitly for token retrieval
+  const loginUrl = "https://user-api.simplybook.it/login";
+
   const params = {
     company_login: companyLogin,
     api_key: publicKey, // Use public key (API key)
   };
 
-  return await sendJsonRpcRequest("getToken", params); // Get the token using the company's login and public API key
+  return await sendJsonRpcRequest("getToken", params, {}, loginUrl); // Send request to the /login endpoint to get the token
 }
 
 // Function to get booking details using the token and JSON-RPC
@@ -102,7 +106,7 @@ export default async function handler(req) {
 
       console.log("Authenticating to get token...");
 
-      // Step 1: Authenticate and get the token via JSON-RPC
+      // Step 1: Authenticate and get the token via JSON-RPC from the login endpoint
       const token = await getToken(companyLogin, publicKey);
 
       console.log("Token received:", token);
