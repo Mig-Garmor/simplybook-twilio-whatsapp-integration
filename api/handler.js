@@ -1,20 +1,12 @@
-import SparkMD5 from "spark-md5"; // Import spark-md5 for MD5 hashing
+// Import necessary modules
+import fetch from "node-fetch";
 
-// Function to generate a simple unique ID (UUID v4)
-function generateUniqueId() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
+// Define the SimplyBook.me API endpoint
+const SIMPLYBOOK_API_URL = "https://user-api.simplybook.it/";
 
 // Function to send a JSON-RPC request to SimplyBook.me
 async function sendJsonRpcRequest(method, params) {
-  const simplybookApiUrl = `https://user-api.simplybook.it/`; // Correct JSON-RPC API endpoint
-  const uniqueId = generateUniqueId(); // Generate unique ID for the request
-
-  const response = await fetch(simplybookApiUrl, {
+  const response = await fetch(SIMPLYBOOK_API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -23,7 +15,7 @@ async function sendJsonRpcRequest(method, params) {
       jsonrpc: "2.0",
       method: method,
       params: params,
-      id: uniqueId, // Set unique ID for the request
+      id: 1, // Unique ID for the request
     }),
   });
 
@@ -35,38 +27,26 @@ async function sendJsonRpcRequest(method, params) {
     );
   }
 
-  // Check if the ID in the response matches the request's ID
-  if (data.id !== uniqueId) {
-    throw new Error("ID mismatch between request and response");
-  }
-
   return data.result; // Return the result from the response
 }
 
-// Function to get the token using JSON-RPC
+// Function to authenticate and get the token
 async function getToken(companyLogin, apiKey) {
-  // JSON-RPC call to get the token
   const params = {
     company_login: companyLogin,
     api_key: apiKey,
   };
 
-  const result = await sendJsonRpcRequest("getToken", params);
-  return result.token;
+  return await sendJsonRpcRequest("getToken", params);
 }
 
-// Function to get booking details using the token and JSON-RPC
-async function getBookingDetails(
-  companyLogin,
-  token,
-  bookingId,
-  bookingHash,
-  apiKey
-) {
-  // Create MD5 hash for signing
-  const sign = SparkMD5.hash(bookingId + bookingHash + apiKey);
+// Example of how to use the token for a booking details call
+async function getBookingDetails(companyLogin, token, bookingId, bookingHash) {
+  const sign = require("crypto")
+    .createHash("md5")
+    .update(bookingId + bookingHash + process.env.SIMPLYBOOK_API_KEY)
+    .digest("hex");
 
-  // JSON-RPC call to get booking details
   const params = {
     id: bookingId,
     sign: sign,
@@ -76,69 +56,25 @@ async function getBookingDetails(
   return result;
 }
 
-export default async function handler(req) {
-  if (req.method === "POST") {
-    try {
-      const { bookingId, bookingHash } = await req.json(); // Get bookingId and bookingHash from the request body
+(async () => {
+  try {
+    // Example usage
+    const companyLogin = "your_company_login"; // Replace with your SimplyBook.me company login
+    const apiKey = "your_api_key"; // Replace with your SimplyBook.me API key
 
-      const simplybookApiKey = process.env.SIMPLYBOOK_API_KEY; // Your SimplyBook API key
-      const companyLogin = process.env.SIMPLYBOOK_COMPANY_LOGIN || "migar"; // Your SimplyBook company login
+    // Step 1: Get the token
+    const token = await getToken(companyLogin, apiKey);
+    console.log("Token:", token);
 
-      // Step 1: Authenticate and get the token via JSON-RPC
-      const token = await getToken(companyLogin, simplybookApiKey);
-
-      // Step 2: Fetch booking details using JSON-RPC
-      const bookingDetails = await getBookingDetails(
-        companyLogin,
-        token,
-        bookingId,
-        bookingHash,
-        simplybookApiKey
-      );
-
-      // Step 3: Return the booking details to the client
-      return new Response(
-        JSON.stringify({
-          message: "Success",
-          bookingDetails,
-        }),
-        {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    } catch (error) {
-      // Handle errors and return appropriate response
-      console.error("Error:", error);
-      return new Response(
-        JSON.stringify({
-          error: error.message,
-        }),
-        {
-          status: 500,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
-  } else {
-    return new Response(
-      JSON.stringify({
-        error: "Method not allowed",
-      }),
-      {
-        status: 405,
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
+    // Step 2: Use the token for subsequent API requests (e.g., get booking details)
+    const bookingDetails = await getBookingDetails(
+      companyLogin,
+      token,
+      "bookingId",
+      "bookingHash"
     );
+    console.log("Booking Details:", bookingDetails);
+  } catch (error) {
+    console.error("Error:", error.message);
   }
-}
-
-export const config = {
-  runtime: "edge", // Use edge runtime for low latency
-};
+})();
