@@ -19,6 +19,10 @@ export default async function handler(req) {
         }),
       });
 
+      //Debug console logs
+      console.log("Simplybook API Response Status:", response.status);
+      console.log("Simplybook API Response Body:", await response.text());
+
       if (!response.ok) {
         throw new Error("Failed to fetch booking details from Simplybook.me");
       }
