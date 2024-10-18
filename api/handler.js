@@ -101,8 +101,7 @@ export default async function handler(req) {
 
       const publicKey = process.env.SIMPLYBOOK_PUBLIC_KEY; // Your SimplyBook public key (API key)
       const secretKey = process.env.SIMPLYBOOK_SECRET_KEY; // Your SimplyBook secret key
-      const companyLogin =
-        process.env.SIMPLYBOOK_COMPANY_LOGIN || "your_company_login"; // Your SimplyBook company login
+      const companyLogin = process.env.SIMPLYBOOK_COMPANY_LOGIN; // Your SimplyBook company login
 
       console.log("Authenticating to get token...");
 
