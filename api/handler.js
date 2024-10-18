@@ -11,7 +11,7 @@ function generateUniqueId() {
 
 // Function to send a JSON-RPC request to SimplyBook.me
 async function sendJsonRpcRequest(method, params) {
-  const simplybookApiUrl = process.SIMPLYBOOK_API_URL; // Correct JSON-RPC API endpoint
+  const simplybookApiUrl = process.env.SIMPLYBOOK_API_URL; // Correct JSON-RPC API endpoint
   const uniqueId = generateUniqueId(); // Generate unique ID for the request
 
   console.log(
