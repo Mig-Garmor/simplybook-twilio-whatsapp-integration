@@ -1,20 +1,16 @@
 {
-  "name": "simplybook-twilio-whatsapp-integration",
+  "name": "simplybook-vercel-app",
   "version": "1.0.0",
-  "description": "Simplybook.me webhook integration with Twilio for WhatsApp messaging.",
-  "main": "index.js",
+  "description": "A Vercel app to receive Simplybook.me booking POST requests",
+  "main": "index.js", 
   "scripts": {
-    "start": "node index.js"
+    "dev": "vercel dev",  
+    "start": "vercel dev"
   },
   "dependencies": {
-    "express": "^4.17.1",
-    "body-parser": "^1.19.0",
-    "twilio": "^3.60.0",
-    "dotenv": "^8.2.0"
+    "express": "^4.17.1"  
   },
-  "engines": {
-    "node": "20.x"
-  },
+  "devDependencies": {},
   "author": "Your Name",
   "license": "MIT"
 }
