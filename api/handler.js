@@ -19,15 +19,14 @@ export default async function handler(req) {
         }),
       });
 
-      //Debug console logs
-      console.log("Simplybook API Response Status:", response.status);
-      console.log("Simplybook API Response Body:", await response.text());
-
       if (!response.ok) {
         throw new Error("Failed to fetch booking details from Simplybook.me");
       }
 
       const bookingDetails = await response.json();
+
+      // Console log the booking details
+      console.log("Booking Details:", bookingDetails);
 
       return new Response(
         JSON.stringify({ message: "Success", bookingDetails }),
@@ -39,6 +38,9 @@ export default async function handler(req) {
         }
       );
     } catch (error) {
+      // Log the error for debugging
+      console.error("Error fetching booking details:", error);
+
       return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
         headers: {
