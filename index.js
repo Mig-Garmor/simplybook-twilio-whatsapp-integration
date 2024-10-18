@@ -5,8 +5,10 @@ const twilio = require("twilio");
 require("dotenv").config(); // Load environment variables from .env file
 
 const app = express();
+const cors = require("cors");
 
 app.use(bodyParser.json());
+app.use(cors());
 
 // Twilio credentials from environment variables
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
