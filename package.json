@@ -6,5 +6,7 @@
     "build": "",
     "start": "vercel dev"
   },
-  "dependencies": {}
+  "dependencies": {
+    "hash-wasm": "^4.11.0"
+  }
 }

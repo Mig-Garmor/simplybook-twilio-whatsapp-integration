@@ -1,4 +1,4 @@
-import crypto from "crypto"; // Built-in Node.js crypto module to generate MD5 hash
+import { md5 } from "hash-wasm"; // Import md5 function from hash-wasm
 
 export default async function handler(req) {
   if (req.method === "POST") {
@@ -10,11 +10,8 @@ export default async function handler(req) {
       const simplybookApiUrl = `https://user-api-v2.simplybook.it/getBookingDetails`;
       const simplybookApiKey = process.env.SIMPLYBOOK_API_KEY; // Store API key in Vercel environment variables
 
-      // Create the MD5 hash (sign parameter)
-      const sign = crypto
-        .createHash("md5")
-        .update(bookingId + bookingHash + secretKey)
-        .digest("hex");
+      // Create the MD5 hash (sign parameter) using hash-wasm
+      const sign = await md5(bookingId + bookingHash + simplybookApiKey);
 
       const response = await fetch(simplybookApiUrl, {
         method: "POST",
