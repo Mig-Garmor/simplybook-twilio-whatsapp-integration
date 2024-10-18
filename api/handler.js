@@ -6,19 +6,41 @@ export default async function handler(req) {
       console.log("req.body", req.body);
       const { bookingId, bookingHash } = await req.json(); // Assume bookingId and bookingHash are sent in the POST request
 
-      // Call Simplybook.me API to get booking details
-      const simplybookApiUrl = `https://user-api-v2.simplybook.it/getBookingDetails`;
-      const simplybookApiKey = process.env.SIMPLYBOOK_API_KEY; // Store API key in Vercel environment variables
+      // 1. Authenticate to get the access token
+      const simplybookLoginUrl = `https://user-api.simplybook.me/v2/login`;
+      const simplybookApiKey = process.env.SIMPLYBOOK_API_KEY; // Your SimplyBook API key
+      const companyLogin = "migar"; // Your SimplyBook company login
 
-      // Create the MD5 hash (sign parameter) using spark-md5
+      // Send login request to get access token
+      const authResponse = await fetch(simplybookLoginUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          company_login: companyLogin,
+          api_key: simplybookApiKey,
+        }),
+      });
+
+      if (!authResponse.ok) {
+        throw new Error("Authentication failed");
+      }
+
+      const { token } = await authResponse.json(); // Extract the token from the response
+
+      // 2. Create the MD5 hash (sign parameter) for the booking details request
       const sign = SparkMD5.hash(bookingId + bookingHash + simplybookApiKey);
+
+      // 3. Use the token to call the SimplyBook.me API to get booking details
+      const simplybookApiUrl = `https://user-api-v2.simplybook.it/getBookingDetails`;
 
       const response = await fetch(simplybookApiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Company-Login": "https://migar.simplybook.it", // Replace with your Simplybook.me company login
-          "X-Token": simplybookApiKey,
+          "X-Company-Login": companyLogin, // Replace with your SimplyBook.me company login
+          "X-Token": token, // Use the access token obtained from the login request
         },
         body: JSON.stringify({
           id: bookingId, // Pass the booking ID
