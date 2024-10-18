@@ -97,6 +97,7 @@ async function getBookingDetails(
 export default async function handler(req) {
   if (req.method === "POST") {
     try {
+      console.log("Received POST request: ", req.body.stringify());
       const { bookingId, bookingHash } = await req.json(); // Get bookingId and bookingHash from the request body
 
       const publicKey = process.env.SIMPLYBOOK_PUBLIC_KEY; // Your SimplyBook public key (API key)
