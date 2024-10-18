@@ -1,19 +1,41 @@
 export default async function handler(req) {
   if (req.method === "POST") {
     try {
-      const data = await req.json(); // Parse incoming POST data
-      console.log("Received POST request:", data);
+      const { bookingId } = await req.json(); // Assume bookingId is sent in the POST request
 
-      // Process the POST data here (e.g., trigger Twilio API, update DB, etc.)
+      // Call Simplybook.me API to get booking details
+      const simplybookApiUrl = `https://user-api-v2.simplybook.it/getBookingDetails`;
+      const simplybookApiKey = process.env.SIMPLYBOOK_API_KEY; // Store API key in Vercel environment variables
 
-      return new Response(JSON.stringify({ message: "Success", data }), {
-        status: 200,
+      const response = await fetch(simplybookApiUrl, {
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-Company-Login": "https://migar.simplybook.it", // Replace with your Simplybook.me company login
+          "X-Token": simplybookApiKey,
         },
+        body: JSON.stringify({
+          id: bookingId, // Pass the booking ID from the request body
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch booking details from Simplybook.me");
+      }
+
+      const bookingDetails = await response.json();
+
+      return new Response(
+        JSON.stringify({ message: "Success", bookingDetails }),
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
     } catch (error) {
-      return new Response(JSON.stringify({ error: "Something went wrong" }), {
+      return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
         headers: {
           "Content-Type": "application/json",
