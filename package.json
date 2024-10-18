@@ -1,15 +1,9 @@
 {
   "name": "vercel-edge-function",
   "version": "1.0.0",
-  "description": "A Node.js project with an edge function deployed on Vercel.",
-  "main": "index.js",
   "scripts": {
-    "dev": "vercel dev",
-    "build": "vercel build",
+    "dev": "vercel dev",     
+    "build": "",             
     "start": "vercel dev"
-  },
-  "dependencies": {},
-  "devDependencies": {
-    "vercel": "^28.0.0"
   }
 }
