@@ -2,11 +2,17 @@ export default async function handler(req) {
   if (req.method === "POST") {
     try {
       console.log("req.body", req.body);
-      const { bookingId } = await req.json(); // Assume bookingId is sent in the POST request
+      const { bookingId, bookingHash } = await req.json(); // Assume bookingId and bookingHash are sent in the POST request
 
       // Call Simplybook.me API to get booking details
       const simplybookApiUrl = `https://user-api-v2.simplybook.it/getBookingDetails`;
       const simplybookApiKey = process.env.SIMPLYBOOK_API_KEY; // Store API key in Vercel environment variables
+
+      // Create the MD5 hash (sign parameter)
+      const sign = crypto
+        .createHash("md5")
+        .update(bookingId + bookingHash + simplybookApiKey)
+        .digest("hex");
 
       const response = await fetch(simplybookApiUrl, {
         method: "POST",
@@ -16,7 +22,8 @@ export default async function handler(req) {
           "X-Token": simplybookApiKey,
         },
         body: JSON.stringify({
-          id: bookingId, // Pass the booking ID from the request body
+          id: bookingId, // Pass the booking ID
+          sign: sign, // Pass the generated sign
         }),
       });
 
