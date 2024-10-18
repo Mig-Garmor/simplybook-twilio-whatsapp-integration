@@ -1,16 +1,15 @@
 {
-  "name": "simplybook-vercel-app",
+  "name": "vercel-edge-function",
   "version": "1.0.0",
-  "description": "A Vercel app to receive Simplybook.me booking POST requests",
-  "main": "index.js", 
+  "description": "A Node.js project with an edge function deployed on Vercel.",
+  "main": "index.js",
   "scripts": {
-    "dev": "vercel dev",  
+    "dev": "vercel dev",
+    "build": "vercel build",
     "start": "vercel dev"
   },
-  "dependencies": {
-    "express": "^4.17.1"  
-  },
-  "devDependencies": {},
-  "author": "Your Name",
-  "license": "MIT"
+  "dependencies": {},
+  "devDependencies": {
+    "vercel": "^28.0.0"
+  }
 }
