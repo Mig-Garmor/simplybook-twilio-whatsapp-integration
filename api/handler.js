@@ -1,4 +1,17 @@
 import SparkMD5 from "spark-md5"; // Import spark-md5 for MD5 hashing
+import twilio from "twilio"; // Import Twilio SDK
+
+//SimplyBook.me credentials
+const publicKey = process.env.SIMPLYBOOK_PUBLIC_KEY; // Your SimplyBook public key (API key)
+const secretKey = process.env.SIMPLYBOOK_SECRET_KEY; // Your SimplyBook secret key
+const companyLogin = process.env.SIMPLYBOOK_COMPANY_LOGIN; // Your SimplyBook company login
+
+// Twilio configuration
+const twilioWhatsAppNumber = process.env.TWILIO_WHATSAPP_NUMBER;
+const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
+
+const client = twilio(twilioAccountSid, twilioAuthToken); // Initialize Twilio client
 
 // Function to generate a simple unique ID (UUID v4)
 function generateUniqueId() {
@@ -93,6 +106,20 @@ async function getBookingDetails(
   return await sendJsonRpcRequest("getBookingDetails", params, headers);
 }
 
+// Function to send WhatsApp message using Twilio
+async function sendWhatsAppMessage(clientPhone, bookingDetails) {
+  try {
+    const message = await client.messages.create({
+      body: `Hello, you have booked a haircut session at Plan B.`,
+      from: `whatsapp:${twilioWhatsAppNumber}`, // Twilio WhatsApp number
+      to: `whatsapp:${clientPhone}`, // Client's phone number
+    });
+    console.log("WhatsApp message sent successfully: ", message.sid);
+  } catch (error) {
+    console.error("Error sending WhatsApp message: ", error);
+  }
+}
+
 // Handler function for Vercel edge function
 export default async function handler(req) {
   if (req.method === "POST") {
@@ -104,10 +131,6 @@ export default async function handler(req) {
       const bookingHash = body.booking_hash;
 
       // const { bookingId, bookingHash } = await req.json(); // Get bookingId and bookingHash from the request body
-
-      const publicKey = process.env.SIMPLYBOOK_PUBLIC_KEY; // Your SimplyBook public key (API key)
-      const secretKey = process.env.SIMPLYBOOK_SECRET_KEY; // Your SimplyBook secret key
-      const companyLogin = process.env.SIMPLYBOOK_COMPANY_LOGIN; // Your SimplyBook company login
 
       console.log("Authenticating to get token...");
 
@@ -124,6 +147,13 @@ export default async function handler(req) {
         token,
         companyLogin
       );
+
+      //Step 3: Send WhatsApp message using Twilio
+      const clientPhone = bookingDetails.client_phone;
+
+      if (clientPhone) {
+        await sendWhatsAppMessage(clientPhone, bookingDetails);
+      }
 
       // Step 3: Return the booking details to the client
       return new Response(
