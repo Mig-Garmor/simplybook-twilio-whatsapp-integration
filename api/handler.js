@@ -1,5 +1,4 @@
 import SparkMD5 from "spark-md5"; // Import spark-md5 for MD5 hashing
-import twilio from "twilio"; // Import Twilio SDK
 
 //SimplyBook.me credentials
 const publicKey = process.env.SIMPLYBOOK_PUBLIC_KEY; // Your SimplyBook public key (API key)
@@ -10,8 +9,6 @@ const companyLogin = process.env.SIMPLYBOOK_COMPANY_LOGIN; // Your SimplyBook co
 const twilioWhatsAppNumber = process.env.TWILIO_WHATSAPP_NUMBER;
 const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
 const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
-
-const client = twilio(twilioAccountSid, twilioAuthToken); // Initialize Twilio client
 
 // Function to generate a simple unique ID (UUID v4)
 function generateUniqueId() {
@@ -106,15 +103,33 @@ async function getBookingDetails(
   return await sendJsonRpcRequest("getBookingDetails", params, headers);
 }
 
-// Function to send WhatsApp message using Twilio
-async function sendWhatsAppMessage(clientPhone, bookingDetails) {
+// Function to send WhatsApp message using Twilio API directly with fetch
+async function sendWhatsAppMessage(clientPhone) {
+  const encodedAuth = Buffer.from(
+    `${twilioAccountSid}:${twilioAuthToken}`
+  ).toString("base64");
+
+  const messageBody = `Hello, you have booked a haircut session at Plan B.`;
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
+
+  const params = new URLSearchParams({
+    Body: messageBody,
+    From: `whatsapp:${twilioWhatsAppNumber}`,
+    To: `whatsapp:${clientPhone}`,
+  });
+
   try {
-    const message = await client.messages.create({
-      body: `Hello, you have booked a haircut session at Plan B.`,
-      from: `whatsapp:${twilioWhatsAppNumber}`, // Twilio WhatsApp number
-      to: `whatsapp:${clientPhone}`, // Client's phone number
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${encodedAuth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params.toString(),
     });
-    console.log("WhatsApp message sent successfully: ", message.sid);
+
+    const data = await response.json();
+    console.log("WhatsApp message sent successfully: ", data.sid);
   } catch (error) {
     console.error("Error sending WhatsApp message: ", error);
   }
@@ -129,8 +144,6 @@ export default async function handler(req) {
 
       const bookingId = body.booking_id;
       const bookingHash = body.booking_hash;
-
-      // const { bookingId, bookingHash } = await req.json(); // Get bookingId and bookingHash from the request body
 
       console.log("Authenticating to get token...");
 
@@ -148,14 +161,14 @@ export default async function handler(req) {
         companyLogin
       );
 
-      //Step 3: Send WhatsApp message using Twilio
+      // Step 3: Send WhatsApp message using Twilio API directly
       const clientPhone = bookingDetails.client_phone;
 
       if (clientPhone) {
-        await sendWhatsAppMessage(clientPhone, bookingDetails);
+        await sendWhatsAppMessage(clientPhone);
       }
 
-      // Step 3: Return the booking details to the client
+      // Step 4: Return the booking details to the client
       return new Response(
         JSON.stringify({
           message: "Success",
