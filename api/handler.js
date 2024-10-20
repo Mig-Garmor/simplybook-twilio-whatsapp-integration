@@ -112,12 +112,6 @@ async function sendWhatsAppMessage(clientPhone, clientName, bookingStatus) {
   const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
   let messageBody;
 
-  const params = new URLSearchParams({
-    Body: messageBody,
-    From: `whatsapp:${twilioWhatsAppNumber}`,
-    To: `whatsapp:${clientPhone}`,
-  });
-
   switch (bookingStatus) {
     case "confirmed":
       messageBody = `Hello ${clientName}, your booking has been confirmed.`;
@@ -129,7 +123,11 @@ async function sendWhatsAppMessage(clientPhone, clientName, bookingStatus) {
       messageBody = `Hello ${clientName}, your booking has been confirmed.`;
   }
 
-  messageBody = `Hello ${clientName}, your booking has been confirmed.`;
+  const params = new URLSearchParams({
+    Body: messageBody,
+    From: `whatsapp:${twilioWhatsAppNumber}`,
+    To: `whatsapp:${clientPhone}`,
+  });
 
   try {
     const response = await fetch(url, {
