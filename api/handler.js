@@ -118,21 +118,23 @@ async function sendWhatsAppMessage(
   const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
   let messageBody;
 
+  const location = "at Plan B";
+
   switch (bookingStatus) {
     case "confirmed":
-      messageBody = `Hello ${clientName}, your booking on the ${formatDate(
+      messageBody = `Hi ${clientName}, your booking on the ${formatDate(
         bookingDate
-      )} has been confirmed.`;
+      )} ${location} has been confirmed.`;
       break;
     case "canceled":
-      messageBody = `Hello ${clientName}, your booking on the ${formatDate(
+      messageBody = `Hi ${clientName}, your booking on the ${formatDate(
         bookingDate
-      )} has been canceled.`;
+      )} ${location} has been canceled.`;
       break;
     default:
-      messageBody = `Hello ${clientName}, your booking on the ${formatDate(
+      messageBody = `Hi ${clientName}, your booking on the ${formatDate(
         bookingDate
-      )} has been confirmed.`;
+      )} ${location} has been changed.`;
   }
 
   const params = new URLSearchParams({
