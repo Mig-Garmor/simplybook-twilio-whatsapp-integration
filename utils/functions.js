@@ -59,6 +59,6 @@ export function formatDate(dateString) {
   // Return both the formatted date and the getBookingTime method
   return {
     getFormattedDate: `${dayOfWeek} ${dayWithSuffix} ${month} ${year}`,
-    getBookingTime: `${hours}:${minutes} ${ampm}`,
+    getFormattedTime: `${hours}:${minutes} ${ampm}`,
   };
 }
