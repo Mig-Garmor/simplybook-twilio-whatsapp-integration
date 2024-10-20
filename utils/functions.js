@@ -48,19 +48,17 @@ export function formatDate(dateString) {
   const dayWithSuffix = day + getOrdinalSuffix(day);
 
   // Method to return the time in AM/PM format
-  function getBookingTime() {
-    let hours = date.getHours();
-    let minutes = date.getMinutes();
-    let ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    hours = hours ? hours : 12; // If the hour is 0, display it as 12
-    minutes = minutes < 10 ? "0" + minutes : minutes; // Add leading 0 to minutes if necessary
-    return `${hours}:${minutes} ${ampm}`;
-  }
+
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  let ampm = hours >= 12 ? "PM" : "AM";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // If the hour is 0, display it as 12
+  minutes = minutes < 10 ? "0" + minutes : minutes; // Add leading 0 to minutes if necessary
 
   // Return both the formatted date and the getBookingTime method
   return {
     getFormattedDate: `${dayOfWeek} ${dayWithSuffix} ${month} ${year}`,
-    getBookingTime: getBookingTime,
+    getBookingTime: `${hours}:${minutes} ${ampm}`,
   };
 }
