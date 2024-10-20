@@ -122,19 +122,17 @@ async function sendWhatsAppMessage(
 
   switch (bookingStatus) {
     case "confirmed":
-      messageBody = `Hi ${clientName}, your booking on the ${formatDate(
+      messageBody = `Hi ${clientName}, your booking on ${formatDate(
         bookingDate
       )} ${location} has been confirmed.`;
       break;
     case "canceled":
-      messageBody = `Hi ${clientName}, your booking on the ${formatDate(
+      messageBody = `Hi ${clientName}, your booking on ${formatDate(
         bookingDate
       )} ${location} has been canceled.`;
       break;
     default:
-      messageBody = `Hi ${clientName}, your booking on the ${formatDate(
-        bookingDate
-      )} ${location} has been changed.`;
+      messageBody = "Reminder triggered";
   }
 
   const params = new URLSearchParams({
@@ -144,6 +142,7 @@ async function sendWhatsAppMessage(
   });
 
   try {
+    if (messageBody === null) throw new Error("Invalid booking status");
     const response = await fetch(url, {
       method: "POST",
       headers: {
