@@ -188,7 +188,7 @@ export default async function handler(req) {
       const bookingStatus = bookingDetails.status;
       const bookingRawDate = bookingDetails.start_date_time;
       const bookingDate = formatDate(bookingRawDate).getFormattedDate;
-      const bookingTime = formatDate(bookingRawDate).getFormattedTime();
+      const bookingTime = formatDate(bookingRawDate).getFormattedTime;
 
       if (clientPhone) {
         await sendWhatsAppMessage(
