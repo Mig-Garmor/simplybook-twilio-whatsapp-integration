@@ -121,13 +121,13 @@ async function sendWhatsAppMessage(
 
   switch (notificationType) {
     case "create":
-      messageBody = `Hi ${clientName}, your booking on ${bookingDate} ${bookingTime} at Plan B has been confirmed.`;
+      messageBody = `Hi ${clientName}, your booking on ${bookingDate} ${bookingTime} has been confirmed.`;
       break;
     case "cancel":
-      messageBody = `Hi ${clientName}, your booking on ${bookingDate} ${bookingTime} at Plan B has been canceled.`;
+      messageBody = `Hi ${clientName}, your booking on ${bookingDate} ${bookingTime} has been canceled.`;
       break;
     case "reminder":
-      messageBody = `Hi ${clientName}, see you at Plan B in 1 hour. We're looking forward to seeing you.`;
+      messageBody = `Hi ${clientName}, your appointment is in 1 hour.`;
     default:
       messageBody = `No notification type matched this type: ${notificationType}`;
   }
