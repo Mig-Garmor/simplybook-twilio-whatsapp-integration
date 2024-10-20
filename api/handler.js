@@ -123,17 +123,13 @@ async function sendWhatsAppMessage(
 
   switch (bookingStatus) {
     case "confirmed":
-      messageBody = `Hi ${clientName}, your booking on ${formatDate(
-        bookingDate
-      )} ${bookingTime} ${location} has been confirmed.`;
+      messageBody = `Hi ${clientName}, your booking on ${bookingDate} ${bookingTime} ${location} has been confirmed.`;
       break;
     case "canceled":
-      messageBody = `Hi ${clientName}, your booking on ${formatDate(
-        bookingDate
-      )} ${location} ${bookingTime} has been canceled.`;
+      messageBody = `Hi ${clientName}, your booking on ${bookingDate} ${bookingTime} ${location} has been canceled.`;
       break;
     default:
-      messageBody = "Reminder triggered";
+      messageBody = "Reminder triggered ";
   }
 
   const params = new URLSearchParams({
@@ -190,8 +186,12 @@ export default async function handler(req) {
       const clientPhone = bookingDetails.client_phone;
       const clientName = bookingDetails.client_name;
       const bookingStatus = bookingDetails.status;
-      const bookingDate = bookingDetails.start_date_time;
-      const bookingTime = formatDate(bookingDate).getBookingTime();
+      const bookingDate = formatDate(
+        bookingDetails.start_date_time
+      ).getFormattedDate();
+      const bookingTime = formatDate(
+        bookingDetails.start_date_time
+      ).getFormattedTime();
 
       if (clientPhone) {
         await sendWhatsAppMessage(
