@@ -104,19 +104,32 @@ async function getBookingDetails(
 }
 
 // Function to send WhatsApp message using Twilio API directly with fetch
-async function sendWhatsAppMessage(clientPhone) {
+async function sendWhatsAppMessage(clientPhone, clientName, bookingStatus) {
   const encodedAuth = Buffer.from(
     `${twilioAccountSid}:${twilioAuthToken}`
   ).toString("base64");
 
-  const messageBody = `Hello, you have booked a haircut session at Plan B.`;
   const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
+  let messageBody;
 
   const params = new URLSearchParams({
     Body: messageBody,
     From: `whatsapp:${twilioWhatsAppNumber}`,
     To: `whatsapp:${clientPhone}`,
   });
+
+  switch (bookingStatus) {
+    case "confirmed":
+      messageBody = `Hello ${clientName}, your booking has been confirmed.`;
+      break;
+    case "canceled":
+      messageBody = `Hello ${clientName}, your booking has been canceled.`;
+      break;
+    default:
+      messageBody = `Hello ${clientName}, your booking has been confirmed.`;
+  }
+
+  messageBody = `Hello ${clientName}, your booking has been confirmed.`;
 
   try {
     const response = await fetch(url, {
@@ -163,9 +176,11 @@ export default async function handler(req) {
 
       // Step 3: Send WhatsApp message using Twilio API directly
       const clientPhone = bookingDetails.client_phone;
+      const clientName = bookingDetails.client_name;
+      const bookingStatus = bookingDetails.status;
 
       if (clientPhone) {
-        await sendWhatsAppMessage(clientPhone);
+        await sendWhatsAppMessage(clientPhone, clientName, bookingStatus);
       }
 
       // Step 4: Return the booking details to the client
