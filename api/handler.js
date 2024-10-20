@@ -108,6 +108,7 @@ async function getBookingDetails(
 async function sendWhatsAppMessage(
   clientPhone,
   clientName,
+  bookingRawDate,
   bookingDate,
   bookingTime,
   notificationType
@@ -127,7 +128,12 @@ async function sendWhatsAppMessage(
       messageBody = `Hi ${clientName}, your booking on ${bookingDate} ${bookingTime} has been canceled.`;
       break;
     case "notify":
-      messageBody = `Hi ${clientName}, your appointment is in 1 hour.`;
+      if (shouldNotify(bookingDate, 1)) {
+        messageBody = `Hi ${clientName}, your appointment is in 1 hour.`;
+      } else {
+        messageBody = "Should not notify";
+      }
+
     default:
       messageBody = `No notification type matched this type: ${notificationType}`;
   }
@@ -141,7 +147,11 @@ async function sendWhatsAppMessage(
   });
 
   try {
-    if (messageBody === null) throw new Error("Invalid booking status");
+    if (messageBody === null) {
+      throw new Error("Invalid booking status");
+    } else if (messageBody === "Should not notify") {
+      throw new Error("Message not sent: Should not notify");
+    }
     const response = await fetch(url, {
       method: "POST",
       headers: {
@@ -193,10 +203,11 @@ export default async function handler(req) {
 
       //PENDING - Include the notification type in the message
       //body.notification_type
-      if (clientPhone && shouldNotify(bookingRawDate, 1)) {
+      if (clientPhone) {
         await sendWhatsAppMessage(
           clientPhone,
           clientName,
+          bookingRawDate,
           bookingDate,
           bookingTime,
           body.notification_type
