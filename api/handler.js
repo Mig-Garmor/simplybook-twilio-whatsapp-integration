@@ -120,13 +120,19 @@ async function sendWhatsAppMessage(
 
   switch (bookingStatus) {
     case "confirmed":
-      messageBody = `Hello ${clientName}, your booking on the ${bookingDate} has been confirmed.`;
+      messageBody = `Hello ${clientName}, your booking on the ${formatDate(
+        bookingDate
+      )} has been confirmed.`;
       break;
     case "canceled":
-      messageBody = `Hello ${clientName}, your booking on the ${bookingDate} has been canceled.`;
+      messageBody = `Hello ${clientName}, your booking on the ${formatDate(
+        bookingDate
+      )} has been canceled.`;
       break;
     default:
-      messageBody = `Hello ${clientName}, your booking on the ${bookingDate} has been confirmed.`;
+      messageBody = `Hello ${clientName}, your booking on the ${formatDate(
+        bookingDate
+      )} has been confirmed.`;
   }
 
   const params = new URLSearchParams({
