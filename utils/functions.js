@@ -62,3 +62,20 @@ export function formatDate(dateString) {
     getFormattedTime: `${hours}:${minutes} ${ampm}`,
   };
 }
+
+export function shouldNotify(bookingDate, hoursLeft) {
+  // Parse the booking date from the provided string format 'YYYY-MM-DD HH:mm:ss'
+  const bookingTime = new Date(bookingDate);
+
+  // Get the current time
+  const currentTime = new Date();
+
+  // Calculate the difference in time (in milliseconds) between the booking time and current time
+  const timeDifference = bookingTime - currentTime;
+
+  // Convert the hoursLeft into milliseconds
+  const hoursLeftInMilliseconds = hoursLeft * 60 * 60 * 1000;
+
+  // If the time difference is less than or equal to the hoursLeftInMilliseconds, return true
+  return timeDifference <= hoursLeftInMilliseconds && timeDifference > 0;
+}

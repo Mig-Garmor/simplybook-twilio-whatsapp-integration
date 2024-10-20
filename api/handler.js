@@ -1,5 +1,5 @@
 import SparkMD5 from "spark-md5"; // Import spark-md5 for MD5 hashing
-import { formatDate } from "../utils/functions.js";
+import { formatDate, shouldNotify } from "../utils/functions.js";
 
 //SimplyBook.me credentials
 const publicKey = process.env.SIMPLYBOOK_PUBLIC_KEY; // Your SimplyBook public key (API key)
@@ -126,7 +126,7 @@ async function sendWhatsAppMessage(
     case "cancel":
       messageBody = `Hi ${clientName}, your booking on ${bookingDate} ${bookingTime} has been canceled.`;
       break;
-    case "reminder":
+    case "notify":
       messageBody = `Hi ${clientName}, your appointment is in 1 hour.`;
     default:
       messageBody = `No notification type matched this type: ${notificationType}`;
@@ -193,7 +193,7 @@ export default async function handler(req) {
 
       //PENDING - Include the notification type in the message
       //body.notification_type
-      if (clientPhone) {
+      if (clientPhone && shouldNotify(bookingRawDate, 1)) {
         await sendWhatsAppMessage(
           clientPhone,
           clientName,
