@@ -109,7 +109,8 @@ async function sendWhatsAppMessage(
   clientPhone,
   clientName,
   bookingStatus,
-  bookingDate
+  bookingDate,
+  bookingTime
 ) {
   const encodedAuth = Buffer.from(
     `${twilioAccountSid}:${twilioAuthToken}`
@@ -124,12 +125,12 @@ async function sendWhatsAppMessage(
     case "confirmed":
       messageBody = `Hi ${clientName}, your booking on ${formatDate(
         bookingDate
-      )} ${location} has been confirmed.`;
+      )} ${bookingTime} ${location} has been confirmed.`;
       break;
     case "canceled":
       messageBody = `Hi ${clientName}, your booking on ${formatDate(
         bookingDate
-      )} ${location} has been canceled.`;
+      )} ${location} ${bookingTime} has been canceled.`;
       break;
     default:
       messageBody = "Reminder triggered";
@@ -190,13 +191,15 @@ export default async function handler(req) {
       const clientName = bookingDetails.client_name;
       const bookingStatus = bookingDetails.status;
       const bookingDate = bookingDetails.start_date_time;
+      const bookingTime = formatDate(bookingDate).getBookingTime();
 
       if (clientPhone) {
         await sendWhatsAppMessage(
           clientPhone,
           clientName,
           bookingStatus,
-          bookingDate
+          bookingDate,
+          bookingTime
         );
       }
 
