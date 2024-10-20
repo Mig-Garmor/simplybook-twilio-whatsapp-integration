@@ -1,4 +1,5 @@
 import SparkMD5 from "spark-md5"; // Import spark-md5 for MD5 hashing
+import { formatDate } from "../utils/functions.js";
 
 //SimplyBook.me credentials
 const publicKey = process.env.SIMPLYBOOK_PUBLIC_KEY; // Your SimplyBook public key (API key)
@@ -104,7 +105,12 @@ async function getBookingDetails(
 }
 
 // Function to send WhatsApp message using Twilio API directly with fetch
-async function sendWhatsAppMessage(clientPhone, clientName, bookingStatus) {
+async function sendWhatsAppMessage(
+  clientPhone,
+  clientName,
+  bookingStatus,
+  bookingDate
+) {
   const encodedAuth = Buffer.from(
     `${twilioAccountSid}:${twilioAuthToken}`
   ).toString("base64");
@@ -114,13 +120,13 @@ async function sendWhatsAppMessage(clientPhone, clientName, bookingStatus) {
 
   switch (bookingStatus) {
     case "confirmed":
-      messageBody = `Hello ${clientName}, your booking has been confirmed.`;
+      messageBody = `Hello ${clientName}, your booking on the ${bookingDate} has been confirmed.`;
       break;
     case "canceled":
-      messageBody = `Hello ${clientName}, your booking has been canceled.`;
+      messageBody = `Hello ${clientName}, your booking on the ${bookingDate} has been canceled.`;
       break;
     default:
-      messageBody = `Hello ${clientName}, your booking has been confirmed.`;
+      messageBody = `Hello ${clientName}, your booking on the ${bookingDate} has been confirmed.`;
   }
 
   const params = new URLSearchParams({
@@ -176,9 +182,15 @@ export default async function handler(req) {
       const clientPhone = bookingDetails.client_phone;
       const clientName = bookingDetails.client_name;
       const bookingStatus = bookingDetails.status;
+      const bookingDate = bookingDetails.start_date_time;
 
       if (clientPhone) {
-        await sendWhatsAppMessage(clientPhone, clientName, bookingStatus);
+        await sendWhatsAppMessage(
+          clientPhone,
+          clientName,
+          bookingStatus,
+          bookingDate
+        );
       }
 
       // Step 4: Return the booking details to the client
