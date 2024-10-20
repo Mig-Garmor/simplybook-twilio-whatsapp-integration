@@ -108,9 +108,9 @@ async function getBookingDetails(
 async function sendWhatsAppMessage(
   clientPhone,
   clientName,
-  bookingStatus,
   bookingDate,
-  bookingTime
+  bookingTime,
+  notificationType
 ) {
   const encodedAuth = Buffer.from(
     `${twilioAccountSid}:${twilioAuthToken}`
@@ -119,23 +119,25 @@ async function sendWhatsAppMessage(
   const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
   let messageBody;
 
-  const location = "at Plan B";
-
-  switch (bookingStatus) {
+  switch (notificationType) {
     case "confirmed":
-      messageBody = `Hi ${clientName}, your booking on ${bookingDate} ${bookingTime} ${location} has been confirmed.`;
+      messageBody = `Hi ${clientName}, your booking on ${bookingDate} ${bookingTime} at Plan B has been confirmed.`;
       break;
     case "canceled":
-      messageBody = `Hi ${clientName}, your booking on ${bookingDate} ${bookingTime} ${location} has been canceled.`;
+      messageBody = `Hi ${clientName}, your booking on ${bookingDate} ${bookingTime} at Plan B has been canceled.`;
       break;
+    case "reminder":
+      messageBody = `Hi ${clientName}, see you at Plan B in 1 hour. We're looking forward to seeing you.`;
     default:
-      messageBody = "Reminder triggered ";
+      messageBody = `No notification type matched this type: ${notificationType}`;
   }
 
   const params = new URLSearchParams({
     Body: messageBody,
     From: `whatsapp:${twilioWhatsAppNumber}`,
     To: `whatsapp:${clientPhone}`,
+    MediaUrl:
+      "https://planbbarber.simplybook.it/uploads/planbbarber/image_files/preview/45082ff229ebc86fefe79123d22a410e.jpeg",
   });
 
   try {
@@ -185,18 +187,19 @@ export default async function handler(req) {
       // Step 3: Send WhatsApp message using Twilio API directly
       const clientPhone = bookingDetails.client_phone;
       const clientName = bookingDetails.client_name;
-      const bookingStatus = bookingDetails.status;
       const bookingRawDate = bookingDetails.start_date_time;
       const bookingDate = formatDate(bookingRawDate).getFormattedDate;
       const bookingTime = formatDate(bookingRawDate).getFormattedTime;
 
+      //PENDING - Include the notification type in the message
+      //body.notification_type
       if (clientPhone) {
         await sendWhatsAppMessage(
           clientPhone,
           clientName,
-          bookingStatus,
           bookingDate,
-          bookingTime
+          bookingTime,
+          body.notification_type
         );
       }
 
