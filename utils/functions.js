@@ -68,16 +68,12 @@ export function shouldNotify(bookingDate, hoursLeft) {
   // Assume the provided date is in CEST (UTC+2)
   const bookingTime = new Date(bookingDate.replace(" ", "T") + "+02:00");
 
-  // Get the current time in UTC and adjust to CEST
+  // Get the current time (which will be in the user's local time zone)
   const currentTime = new Date();
-  const offset = currentTime.getTimezoneOffset(); // Get the offset in minutes from UTC
-  const currentTimeInCEST = new Date(
-    currentTime.getTime() + (offset + 120) * 60 * 1000
-  ); // Adjust to CEST
 
-  // Calculate the time difference in hours
-  const timeDifferenceInHours =
-    (bookingTime - currentTimeInCEST) / (1000 * 60 * 60);
+  // The Date object automatically converts times to UTC for internal calculations
+  // Calculate the time difference in hours (normalized to UTC)
+  const timeDifferenceInHours = (bookingTime - currentTime) / (1000 * 60 * 60);
 
   // Return true if the time difference is less than or equal to hoursLeft and greater than 0
   return timeDifferenceInHours <= hoursLeft && timeDifferenceInHours > 0;
