@@ -66,7 +66,8 @@ export function formatDate(dateString) {
 export function shouldNotify(bookingDate, hoursLeft) {
   // Parse the booking date from the provided string format 'YYYY-MM-DD HH:mm:ss'
   // Assume the provided date is in CEST (UTC+2)
-  const isoFormattedBookingDate = bookingDate.replace(" ", "T") + "+02:00";
+  const isoFormattedBookingDate = convertToISO8601(bookingDate, "+02:00");
+  console.log("Formatted booking date:", isoFormattedBookingDate);
   const bookingTime = new Date(isoFormattedBookingDate);
   console.log("Booking time:", bookingTime);
 
@@ -80,4 +81,14 @@ export function shouldNotify(bookingDate, hoursLeft) {
 
   // Return true if the time difference is less than or equal to hoursLeft and greater than 0
   return timeDifferenceInHours <= hoursLeft && timeDifferenceInHours > 0;
+}
+
+function convertToISO8601(dateString, offset) {
+  // Add 'T' between the date and time parts
+  let isoString = dateString.replace(" ", "T");
+
+  // Append the timezone offset (e.g., "+02:00")
+  isoString += offset;
+
+  return isoString;
 }
