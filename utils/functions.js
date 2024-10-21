@@ -67,9 +67,11 @@ export function shouldNotify(bookingDate, hoursLeft) {
   // Parse the booking date from the provided string format 'YYYY-MM-DD HH:mm:ss'
   // Assume the provided date is in CEST (UTC+2)
   const bookingTime = new Date(bookingDate.replace(" ", "T") + "+02:00");
+  console.log("Booking time:", bookingTime);
 
   // Get the current time (which will be in the user's local time zone)
   const currentTime = new Date();
+  console.log("Current time:", currentTime);
 
   // The Date object automatically converts times to UTC for internal calculations
   // Calculate the time difference in hours (normalized to UTC)
