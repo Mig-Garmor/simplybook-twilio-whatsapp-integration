@@ -69,9 +69,11 @@ export function shouldNotify(bookingDate, hoursLeft) {
 
   // Get the current time
   const currentTime = new Date();
+  console.log("Current time: ", currentTime);
 
   // Calculate the difference in time (in milliseconds) between the booking time and current time
   const timeDifference = bookingTime - currentTime;
+  console.log("Time difference: ", timeDifference);
 
   // Convert the hoursLeft into milliseconds
   const hoursLeftInMilliseconds = hoursLeft * 60 * 60 * 1000;
