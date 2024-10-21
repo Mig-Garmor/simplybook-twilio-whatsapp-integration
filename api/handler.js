@@ -133,6 +133,7 @@ async function sendWhatsAppMessage(
       } else {
         messageBody = "Should not notify";
       }
+      break;
 
     default:
       messageBody = `No notification type matched this type: ${notificationType}`;
