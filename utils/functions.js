@@ -66,7 +66,8 @@ export function formatDate(dateString) {
 export function shouldNotify(bookingDate, hoursLeft) {
   // Parse the booking date from the provided string format 'YYYY-MM-DD HH:mm:ss'
   // Assume the provided date is in CEST (UTC+2)
-  const bookingTime = new Date(bookingDate.replace(" ", "T") + "+02:00");
+  const isoFormattedBookingDate = bookingDate.replace(" ", "T") + "+02:00";
+  const bookingTime = new Date(isoFormattedBookingDate);
   console.log("Booking time:", bookingTime);
 
   // Get the current time (which will be in the user's local time zone)
