@@ -65,19 +65,20 @@ export function formatDate(dateString) {
 
 export function shouldNotify(bookingDate, hoursLeft) {
   // Parse the booking date from the provided string format 'YYYY-MM-DD HH:mm:ss'
-  const bookingTime = new Date(bookingDate);
+  // Assume the provided date is in CEST (UTC+2)
+  const bookingTime = new Date(bookingDate.replace(" ", "T") + "+02:00");
 
-  // Get the current time
+  // Get the current time in UTC and adjust to CEST
   const currentTime = new Date();
-  console.log("Current time: ", currentTime);
+  const offset = currentTime.getTimezoneOffset(); // Get the offset in minutes from UTC
+  const currentTimeInCEST = new Date(
+    currentTime.getTime() + (offset + 120) * 60 * 1000
+  ); // Adjust to CEST
 
-  // Calculate the difference in time (in milliseconds) between the booking time and current time
-  const timeDifference = bookingTime - currentTime;
-  console.log("Time difference: ", timeDifference);
+  // Calculate the time difference in hours
+  const timeDifferenceInHours =
+    (bookingTime - currentTimeInCEST) / (1000 * 60 * 60);
 
-  // Convert the hoursLeft into milliseconds
-  const hoursLeftInMilliseconds = hoursLeft * 60 * 60 * 1000;
-
-  // If the time difference is less than or equal to the hoursLeftInMilliseconds, return true
-  return timeDifference <= hoursLeftInMilliseconds && timeDifference > 0;
+  // Return true if the time difference is less than or equal to hoursLeft and greater than 0
+  return timeDifferenceInHours <= hoursLeft && timeDifferenceInHours > 0;
 }
