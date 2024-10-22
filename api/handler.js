@@ -127,7 +127,9 @@ async function sendWhatsAppMessage(
       • ${bookingTime}`;
       break;
     case "cancel":
-      messageBody = `Hi ${clientName}, your booking on ${bookingDate} at ${bookingTime} has been *cancelled*.`;
+      messageBody = `Hi ${clientName}, your booking has been *cancelled* for:
+      • ${bookingDate}
+      • ${bookingTime}`;
       break;
     case "notify":
       if (shouldNotify(bookingRawDate, 1)) {
