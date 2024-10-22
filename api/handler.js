@@ -122,7 +122,7 @@ async function sendWhatsAppMessage(
 
   switch (notificationType) {
     case "create":
-      messageBody = `Hi ${clientName}, your booking has been *confirmed* on:
+      messageBody = `Hi ${clientName}, your booking has been *confirmed* for:
       • ${bookingDate}
       • ${bookingTime} (CEST)`;
       break;
