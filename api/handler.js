@@ -104,6 +104,20 @@ async function getBookingDetails(
   return await sendJsonRpcRequest("getBookingDetails", params, headers);
 }
 
+async function getLocationsList(token, companyLogin, isPublic = true) {
+  const params = {
+    isPublic: isPublic, // Set to true for public locations, false for private locations
+  };
+
+  // Pass the token and company login as headers
+  const headers = {
+    "X-Company-Login": companyLogin,
+    "X-Token": token,
+  };
+
+  return await sendJsonRpcRequest("getLocationsList", params, headers);
+}
+
 // Function to send WhatsApp message using Twilio API directly with fetch
 async function sendWhatsAppMessage(
   clientPhone,
@@ -190,7 +204,7 @@ export default async function handler(req) {
 
       console.log("Token received:", token);
 
-      // Step 2: Fetch booking details using JSON-RPC
+      // Step 2.1: Fetch booking details using JSON-RPC
       const bookingDetails = await getBookingDetails(
         bookingId,
         bookingHash,
@@ -198,6 +212,11 @@ export default async function handler(req) {
         token,
         companyLogin
       );
+
+      // Step 2.2 Fetch the list of locations
+      const locationList = await getLocationsList(token, companyLogin);
+
+      console.log("Locations List:", locationList);
 
       // Step 3: Send WhatsApp message using Twilio API directly
       const clientPhone = bookingDetails.client_phone;
