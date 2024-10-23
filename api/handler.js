@@ -104,20 +104,6 @@ async function getBookingDetails(
   return await sendJsonRpcRequest("getBookingDetails", params, headers);
 }
 
-async function getLocationsList(token, companyLogin, isPublic = true) {
-  const params = {
-    isPublic: isPublic, // Set to true for public locations, false for private locations
-  };
-
-  // Pass the token and company login as headers
-  const headers = {
-    "X-Company-Login": companyLogin,
-    "X-Token": token,
-  };
-
-  return await sendJsonRpcRequest("getLocationsList", params, headers);
-}
-
 // Function to send WhatsApp message using Twilio API directly with fetch
 async function sendWhatsAppMessage(
   clientPhone,
@@ -144,6 +130,11 @@ async function sendWhatsAppMessage(
       messageBody = `Hi ${clientName}, your booking has been *cancelled* for:
       • ${bookingDate}
       • ${bookingTime} (CEST)`;
+      break;
+    case "change":
+      messageBody = `Hi ${clientName}, your booking has been *changed* to:
+        • ${bookingDate}
+        • ${bookingTime} (CEST)`;
       break;
     case "notify":
       if (shouldNotify(bookingRawDate, 1)) {
@@ -212,11 +203,6 @@ export default async function handler(req) {
         token,
         companyLogin
       );
-
-      // Step 2.2 Fetch the list of locations
-      const locationList = await getLocationsList(token, companyLogin);
-
-      console.log("Locations List:", locationList);
 
       // Step 3: Send WhatsApp message using Twilio API directly
       const clientPhone = bookingDetails.client_phone;
