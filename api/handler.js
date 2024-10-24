@@ -111,7 +111,8 @@ async function sendWhatsAppMessage(
   bookingRawDate,
   bookingDate,
   bookingTime,
-  notificationType
+  notificationType,
+  location
 ) {
   const encodedAuth = Buffer.from(
     `${twilioAccountSid}:${twilioAuthToken}`
@@ -124,17 +125,26 @@ async function sendWhatsAppMessage(
     case "create":
       messageBody = `Hi ${clientName}, your booking has been *confirmed* for:
       • ${bookingDate}
-      • ${bookingTime} (CEST)`;
+      • ${bookingTime} (CEST)
+      
+      Location: ${getBookingLocation(location)}
+      `;
       break;
     case "cancel":
       messageBody = `Hi ${clientName}, your booking has been *cancelled* for:
       • ${bookingDate}
-      • ${bookingTime} (CEST)`;
+      • ${bookingTime} (CEST)
+      
+      Location: ${getBookingLocation(location)}
+      `;
       break;
     case "change":
       messageBody = `Hi ${clientName}, your booking has been *changed* to:
-        • ${bookingDate}
-        • ${bookingTime} (CEST)`;
+      • ${bookingDate}
+      • ${bookingTime} (CEST)
+      
+      Location: ${getBookingLocation(location)} 
+      `;
       break;
     case "notify":
       if (shouldNotify(bookingRawDate, 1)) {
@@ -210,6 +220,7 @@ export default async function handler(req) {
       const bookingRawDate = bookingDetails.start_date_time;
       const bookingDate = formatDate(bookingRawDate).getFormattedDate;
       const bookingTime = formatDate(bookingRawDate).getFormattedTime;
+      const location = bookingDetails.unit_description;
 
       //PENDING - Include the notification type in the message
       //body.notification_type
@@ -220,7 +231,8 @@ export default async function handler(req) {
           bookingRawDate,
           bookingDate,
           bookingTime,
-          body.notification_type
+          body.notification_type,
+          location
         );
       }
 

@@ -92,3 +92,14 @@ function convertToISO8601(dateString, offset) {
 
   return isoString;
 }
+
+export function getBookingLocation(providerDescription) {
+  const locationString = providerDescription.toLowerCase();
+  if (locationString.l.includes("sliema")) {
+    return "https://maps.app.goo.gl/mXbiac8gqXmuLMCb6";
+  } else if (locationString.includes("balluta")) {
+    return "https://maps.app.goo.gl/6nG1Md58XaF8Tcwr8";
+  } else {
+    return "no location found";
+  }
+}
