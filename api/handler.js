@@ -1,5 +1,9 @@
 import SparkMD5 from "spark-md5"; // Import spark-md5 for MD5 hashing
-import { formatDate, shouldNotify } from "../utils/functions.js";
+import {
+  formatDate,
+  shouldNotify,
+  getBookingLocation,
+} from "../utils/functions.js";
 
 //SimplyBook.me credentials
 const publicKey = process.env.SIMPLYBOOK_PUBLIC_KEY; // Your SimplyBook public key (API key)
