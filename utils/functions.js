@@ -96,9 +96,15 @@ function convertToISO8601(dateString, offset) {
 export function getBookingLocation(providerDescription) {
   const locationString = providerDescription.toLowerCase();
   if (locationString.includes("sliema")) {
-    return "https://maps.app.goo.gl/mXbiac8gqXmuLMCb6";
+    return {
+      googleMapsLink: "https://maps.app.goo.gl/mXbiac8gqXmuLMCb6",
+      name: "Plan B - Sliema",
+    };
   } else if (locationString.includes("balluta")) {
-    return "https://maps.app.goo.gl/6nG1Md58XaF8Tcwr8";
+    return {
+      googleMapsLink: "https://maps.app.goo.gl/6nG1Md58XaF8Tcwr8",
+      name: "Plan B - Balluta",
+    };
   } else {
     return "no location found";
   }

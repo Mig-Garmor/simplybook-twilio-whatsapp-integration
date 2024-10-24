@@ -125,13 +125,17 @@ async function sendWhatsAppMessage(
   const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
   let messageBody;
 
+  const bookingLocationUrl = getBookingLocation(location).googleMapsLink;
+  const bookingLocationName = getBookingLocation(location).name;
+
   switch (notificationType) {
     case "create":
       messageBody = `Hi ${clientName}, your booking has been *confirmed* for:
       • ${bookingDate}
       • ${bookingTime} (CEST)
       
-Location: ${getBookingLocation(location)}
+Location: ${bookingLocationName}
+${bookingLocationUrl}
       `;
       break;
     case "cancel":
@@ -139,7 +143,8 @@ Location: ${getBookingLocation(location)}
       • ${bookingDate}
       • ${bookingTime} (CEST)
       
-Location: ${getBookingLocation(location)}
+Location: ${bookingLocationName}
+${bookingLocationUrl}
       `;
       break;
     case "change":
@@ -147,7 +152,8 @@ Location: ${getBookingLocation(location)}
       • ${bookingDate}
       • ${bookingTime} (CEST)
 
-Location: ${getBookingLocation(location)} 
+Location: ${bookingLocationName}
+${bookingLocationUrl}
       `;
       break;
     case "notify":
