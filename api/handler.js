@@ -131,7 +131,7 @@ async function sendWhatsAppMessage(
       • ${bookingDate}
       • ${bookingTime} (CEST)
       
-      Location: ${getBookingLocation(location)}
+Location: ${getBookingLocation(location)}
       `;
       break;
     case "cancel":
@@ -139,15 +139,15 @@ async function sendWhatsAppMessage(
       • ${bookingDate}
       • ${bookingTime} (CEST)
       
-      Location: ${getBookingLocation(location)}
+Location: ${getBookingLocation(location)}
       `;
       break;
     case "change":
       messageBody = `Hi ${clientName}, your booking has been *changed* to:
       • ${bookingDate}
       • ${bookingTime} (CEST)
-      
-      Location: ${getBookingLocation(location)} 
+
+Location: ${getBookingLocation(location)} 
       `;
       break;
     case "notify":
