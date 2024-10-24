@@ -95,7 +95,7 @@ function convertToISO8601(dateString, offset) {
 
 export function getBookingLocation(providerDescription) {
   const locationString = providerDescription.toLowerCase();
-  if (locationString.l.includes("sliema")) {
+  if (locationString.includes("sliema")) {
     return "https://maps.app.goo.gl/mXbiac8gqXmuLMCb6";
   } else if (locationString.includes("balluta")) {
     return "https://maps.app.goo.gl/6nG1Md58XaF8Tcwr8";
