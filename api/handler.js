@@ -112,7 +112,7 @@ async function getBookingDetails(
 // Function to get all bookings using the token and JSON-RPC
 async function getAllBookings(token, companyLogin) {
   // Admin endpoint
-  const adminEndpointUrl = `${process.env.SIMPLYBOOK_API_URL}/admin`;
+  const adminEndpointUrl = `${process.env.SIMPLYBOOK_API_URL}/admin/bookings`;
   // Define a basic filter object, which could be expanded as needed
   const params = {
     filter: {
