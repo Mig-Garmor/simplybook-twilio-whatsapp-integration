@@ -263,6 +263,7 @@ export default async function handler(req) {
       );
 
       console.log("Token received:", token);
+      console.log("User Token received: ", userToken);
 
       // Step 2.1: Fetch booking details using JSON-RPC
       const bookingDetails = await getBookingDetails(
