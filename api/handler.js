@@ -108,6 +108,18 @@ async function getBookingDetails(
   return await sendJsonRpcRequest("getBookingDetails", params, headers);
 }
 
+//DELETE
+// Function to get all bookings using the token and JSON-RPC
+async function getAllBookings(companyLogin) {
+  // Pass the token and company login as headers
+  const headers = {
+    "X-Company-Login": companyLogin,
+    "X-Token": token,
+  };
+
+  return await sendJsonRpcRequest("getBookings", _, headers);
+}
+
 // Function to send WhatsApp message using Twilio API directly with fetch
 async function sendWhatsAppMessage(
   clientPhone,
@@ -223,6 +235,11 @@ export default async function handler(req) {
         token,
         companyLogin
       );
+
+      //DELETE
+      const allBookings = await getAllBookings();
+
+      console.log("ALL BOOKINGS: ", allBookings);
 
       // Step 3: Send WhatsApp message using Twilio API directly
       const clientPhone = bookingDetails.client_phone;
