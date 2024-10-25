@@ -4,5 +4,10 @@
       "path": "/api/recurring",
       "schedule": "7 9 * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/handler.js": {
+      "runtime": "nodejs"
+    }
+  }
 }
