@@ -14,21 +14,21 @@ const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
 const mediaUrl =
   "https://planbbarber.simplybook.it/uploads/planbbarber/image_files/preview/45082ff229ebc86fefe79123d22a410e.jpeg";
 
-// Function to fetch bookings from exactly one hour ago
-async function getBookingsFromExactHourAgo(userToken, companyLogin) {
+// Function to fetch bookings from exactly one month ago
+async function getBookingsFromExactMonthAgo(userToken, companyLogin) {
   const adminEndpointUrl = `${process.env.SIMPLYBOOK_API_URL}/admin`;
 
   const currentDate = new Date();
-  const exactHourAgoDate = new Date(currentDate);
-  exactHourAgoDate.setHours(currentDate.getHours() - 1);
+  const exactMonthAgoDate = new Date(currentDate);
+  exactMonthAgoDate.setMonth(currentDate.getMonth() - 1);
 
-  const dateFromStr = exactHourAgoDate.toISOString().split(".")[0];
-  const dateToStr = dateFromStr; // Set both `date_from` and `date_to` to the same hour
+  // Format the date to get only the day from exactly one month ago
+  const dateStr = exactMonthAgoDate.toISOString().split("T")[0];
 
   const params = {
     filter: {
-      date_from: dateFromStr,
-      date_to: dateToStr,
+      date_from: dateStr, // Start date set to exactly one month ago
+      date_to: dateStr, // End date set to the same day
     },
   };
 
@@ -98,7 +98,7 @@ export default async function handler(req) {
 
       // Step 1: Fetch bookings from exactly one month ago
       console.log("Fetching bookings from exactly one month ago...");
-      const bookings = await getBookingsFromExactHourAgo(
+      const bookings = await getBookingsFromExactMonthAgo(
         userToken,
         companyLogin
       );
