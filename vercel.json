@@ -1,10 +1,10 @@
 {
   "functions": {
     "api/handler.js": {
-      "runtime": "nodejs"
+      "runtime": "edge"
     },
     "api/recurring.js": {
-      "runtime": "nodejs"
+      "runtime": "edge"
     }
   },
   "crons": [
