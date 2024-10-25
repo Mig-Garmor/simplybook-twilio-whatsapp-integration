@@ -37,6 +37,39 @@ async function getBookingsFromExactMonthAgo(userToken, companyLogin) {
   );
 }
 
+//DELETE - Function to get bookings from exactly one hour ago
+async function getBookingsFromExactHourAgo(userToken, companyLogin) {
+  const adminEndpointUrl = `${process.env.SIMPLYBOOK_API_URL}/admin`;
+
+  // Get the current date and adjust it to one hour ago
+  const currentDate = new Date();
+  const exactHourAgoDate = new Date(currentDate);
+  exactHourAgoDate.setHours(currentDate.getHours() - 1);
+
+  // Format date and time to YYYY-MM-DDTHH:MM:SS (ISO format without milliseconds)
+  const dateFromStr = exactHourAgoDate.toISOString().split(".")[0];
+  const dateToStr = dateFromStr; // Same start and end timestamp for exactly one hour ago
+
+  const params = {
+    filter: {
+      date_from: dateFromStr, // Start date and time exactly one hour ago
+      date_to: dateToStr, // End date and time the same hour
+    },
+  };
+
+  const headers = {
+    "X-Company-Login": companyLogin,
+    "X-User-Token": userToken,
+  };
+
+  return await sendJsonRpcRequest(
+    "getBookings",
+    params,
+    headers,
+    adminEndpointUrl
+  );
+}
+
 // Handler function for Vercel cron job
 export default async function handler(req) {
   if (req.method === "GET") {
@@ -54,12 +87,21 @@ export default async function handler(req) {
       console.log("User Token received:", userToken);
 
       // Step 2: Fetch bookings from exactly one month ago
-      const exactMonthAgoBookings = await getBookingsFromExactMonthAgo(
+      //   const exactMonthAgoBookings = await getBookingsFromExactMonthAgo(
+      //     userToken,
+      //     companyLogin
+      //   );
+      //   console.log(
+      //     "Bookings from exactly one month ago: ",
+      //     exactMonthAgoBookings
+      //   );
+
+      const exactMonthAgoBookings = await getBookingsFromExactHourAgo(
         userToken,
         companyLogin
       );
       console.log(
-        "Bookings from exactly one month ago: ",
+        "Bookings from exactly one hour ago: ",
         exactMonthAgoBookings
       );
 
