@@ -5,19 +5,22 @@ const companyLogin = process.env.SIMPLYBOOK_COMPANY_LOGIN;
 const userLogin = process.env.SIMPLYBOOK_USER_LOGIN;
 const userPassword = process.env.SIMPLYBOOK_USER_PASSWORD;
 
-// Function to get bookings from the last month
-async function getBookingsFromLastMonth(userToken, companyLogin) {
+// Function to get bookings from exactly one month ago
+async function getBookingsFromExactMonthAgo(userToken, companyLogin) {
   const adminEndpointUrl = `${process.env.SIMPLYBOOK_API_URL}/admin`;
 
-  // Set the date range for the last month (you can modify this logic as needed)
+  // Get the current date and adjust it to one month ago
   const currentDate = new Date();
-  const lastMonthDate = new Date();
-  lastMonthDate.setMonth(currentDate.getMonth() - 1); // Set to one month ago
+  const exactMonthAgoDate = new Date(currentDate);
+  exactMonthAgoDate.setMonth(currentDate.getMonth() - 1);
+
+  // Format the date to YYYY-MM-DD for both from and to fields
+  const dateStr = exactMonthAgoDate.toISOString().split("T")[0];
 
   const params = {
     filter: {
-      date_from: lastMonthDate.toISOString().split("T")[0], // Last month start date
-      date_to: currentDate.toISOString().split("T")[0], // Today's date
+      date_from: dateStr, // Start and end date set to exactly one month ago
+      date_to: dateStr, // The same day
     },
   };
 
@@ -39,7 +42,7 @@ export default async function handler(req) {
   if (req.method === "GET") {
     try {
       console.log(
-        "Cron job triggered, fetching bookings for the last month..."
+        "Cron job triggered, fetching bookings from exactly one month ago..."
       );
 
       // Step 1: Authenticate and get the user token
@@ -50,18 +53,21 @@ export default async function handler(req) {
       );
       console.log("User Token received:", userToken);
 
-      // Step 2: Fetch bookings from the last month
-      const lastMonthBookings = await getBookingsFromLastMonth(
+      // Step 2: Fetch bookings from exactly one month ago
+      const exactMonthAgoBookings = await getBookingsFromExactMonthAgo(
         userToken,
         companyLogin
       );
-      console.log("Last Month's Bookings: ", lastMonthBookings);
+      console.log(
+        "Bookings from exactly one month ago: ",
+        exactMonthAgoBookings
+      );
 
       // Return the bookings or perform other actions
       return new Response(
         JSON.stringify({
           message: "Success",
-          bookings: lastMonthBookings,
+          bookings: exactMonthAgoBookings,
         }),
         {
           status: 200,
