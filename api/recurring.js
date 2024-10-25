@@ -55,10 +55,10 @@ async function sendWhatsAppMessage(clientPhone, clientName) {
 
   const messageBody = `${clientName}, it's been one month since your last haircut. 
   
-  Book here and get a fresh haircut!
+Book here and get a fresh haircut!
 
-  https://planbbarber.simplybook.it/
-  `;
+https://planbbarber.simplybook.it/
+`;
 
   const params = new URLSearchParams({
     Body: messageBody,
