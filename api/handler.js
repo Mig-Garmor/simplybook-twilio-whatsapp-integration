@@ -117,7 +117,7 @@ async function getAllBookings(token, companyLogin) {
     "X-Token": token,
   };
 
-  return await sendJsonRpcRequest("getBookings", _, headers);
+  return await sendJsonRpcRequest("getBookings", {}, headers);
 }
 
 // Function to send WhatsApp message using Twilio API directly with fetch
