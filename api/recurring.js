@@ -81,7 +81,7 @@ async function sendWhatsAppMessage(clientPhone, clientName) {
 
 // Main handler function for Vercel Edge Function
 export default async function handler(req) {
-  if (req.method === "POST") {
+  if (req.method === "POST" || req.method === "GET") {
     try {
       console.log("Fetching user token...");
       const userToken = await getUserToken(
