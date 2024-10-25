@@ -141,7 +141,7 @@ async function getAllBookings(userToken, companyLogin) {
   // Pass the token and company login as headers
   const headers = {
     "X-Company-Login": companyLogin,
-    "X-Token": userToken,
+    "X-User-Token": userToken,
   };
 
   return await sendJsonRpcRequest(
