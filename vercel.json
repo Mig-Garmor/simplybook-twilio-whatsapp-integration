@@ -1,13 +1,16 @@
 {
+  "functions": {
+    "api/handler.js": {
+      "runtime": "nodejs"
+    },
+    "api/recurring.js": {
+      "runtime": "nodejs"
+    }
+  },
   "crons": [
     {
       "path": "/api/recurring",
       "schedule": "7 9 * * *"
     }
-  ],
-  "functions": {
-    "api/handler.js": {
-      "runtime": "nodejs"
-    }
-  }
+  ]
 }
