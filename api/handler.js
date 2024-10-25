@@ -110,7 +110,7 @@ async function getBookingDetails(
 
 //DELETE
 // Function to get all bookings using the token and JSON-RPC
-async function getAllBookings(companyLogin) {
+async function getAllBookings(token, companyLogin) {
   // Pass the token and company login as headers
   const headers = {
     "X-Company-Login": companyLogin,
@@ -237,7 +237,7 @@ export default async function handler(req) {
       );
 
       //DELETE
-      const allBookings = await getAllBookings();
+      const allBookings = await getAllBookings(token, companyLogin);
 
       console.log("ALL BOOKINGS: ", allBookings);
 
