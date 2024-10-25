@@ -1,8 +1,8 @@
-import SparkMD5 from "spark-md5"; // Import spark-md5 for MD5 hashing
 import {
   formatDate,
   shouldNotify,
   getBookingLocation,
+  generateMD5Hash,
 } from "../utils/functions.js";
 
 //SimplyBook.me credentials
@@ -108,7 +108,7 @@ async function getBookingDetails(
   companyLogin
 ) {
   // Create MD5 hash for signing (according to SimplyBook.me authentication process)
-  const sign = SparkMD5.hash(bookingId + bookingHash + secretKey); // Sign using bookingId, bookingHash, and secret key
+  const sign = await generateMD5Hash(bookingId + bookingHash + secretKey);
 
   // JSON-RPC call to get booking details
   const params = {
