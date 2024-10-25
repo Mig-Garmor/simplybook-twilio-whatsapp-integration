@@ -120,3 +120,70 @@ export async function generateMD5Hash(input) {
     .join("");
   return hashHex;
 }
+
+//--CRON JOBS--//
+
+// Function to generate a simple unique ID (UUID v4)
+function generateUniqueId() {
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === "x" ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+// Function to send a JSON-RPC request to SimplyBook.me
+export async function sendJsonRpcRequest(
+  method,
+  params,
+  headers = {},
+  endpoint = ""
+) {
+  const simplybookApiUrl =
+    endpoint ||
+    process.env.SIMPLYBOOK_API_URL ||
+    "https://user-api.simplybook.it";
+  const uniqueId = generateUniqueId(); // Generate unique ID for the request
+
+  console.log(
+    `Sending JSON-RPC request to ${simplybookApiUrl} with method: ${method}`,
+    params
+  );
+
+  const response = await fetch(`${simplybookApiUrl}/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...headers,
+    },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      method: method,
+      params: params,
+      id: uniqueId,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (data.error) {
+    throw new Error(
+      `JSON-RPC Error: ${data.error.message} (Code: ${data.error.code})`
+    );
+  }
+
+  return data.result;
+}
+
+// Function to get the user token using the login endpoint (Client Authorization)
+export async function getUserToken(companyLogin, userLogin, userPassword) {
+  const loginUrl = `${process.env.SIMPLYBOOK_API_URL}/login`;
+
+  const params = {
+    companyLogin,
+    userLogin,
+    userPassword,
+  };
+
+  return await sendJsonRpcRequest("getUserToken", params, {}, loginUrl);
+}

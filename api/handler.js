@@ -3,6 +3,8 @@ import {
   shouldNotify,
   getBookingLocation,
   generateMD5Hash,
+  sendJsonRpcRequest,
+  getUserToken,
 } from "../utils/functions.js";
 
 //SimplyBook.me credentials
@@ -18,60 +20,6 @@ const twilioWhatsAppNumber = process.env.TWILIO_WHATSAPP_NUMBER;
 const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
 const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
 
-// Function to generate a simple unique ID (UUID v4)
-function generateUniqueId() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0;
-    const v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
-
-// Function to send a JSON-RPC request to SimplyBook.me
-async function sendJsonRpcRequest(method, params, headers = {}, endpoint = "") {
-  const simplybookApiUrl =
-    endpoint ||
-    process.env.SIMPLYBOOK_API_URL ||
-    "https://user-api.simplybook.it"; // Correct JSON-RPC API endpoint
-  const uniqueId = generateUniqueId(); // Generate unique ID for the request
-
-  console.log(
-    `Sending JSON-RPC request to ${simplybookApiUrl} with method: ${method} and params:`,
-    params
-  );
-
-  const response = await fetch(`${simplybookApiUrl}/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...headers, // Include any additional headers (like token authorization)
-    },
-    body: JSON.stringify({
-      jsonrpc: "2.0",
-      method: method,
-      params: params,
-      id: uniqueId, // Set unique ID for the request
-    }),
-  });
-
-  const data = await response.json();
-
-  console.log("JSON-RPC Response:", data);
-
-  if (data.error) {
-    throw new Error(
-      `JSON-RPC Error: ${data.error.message} (Code: ${data.error.code})`
-    );
-  }
-
-  // Check if the ID in the response matches the request's ID
-  if (data.id !== uniqueId) {
-    throw new Error("ID mismatch between request and response");
-  }
-
-  return data.result; // Return the result from the response
-}
-
 // Function to get the token using the login endpoint (Client Authorization)
 async function getToken(companyLogin, publicKey) {
   // Use the login endpoint explicitly for token retrieval
@@ -83,20 +31,6 @@ async function getToken(companyLogin, publicKey) {
   };
 
   return await sendJsonRpcRequest("getToken", params, {}, loginUrl); // Send request to the /login endpoint to get the token
-}
-
-// Function to get the token using the login endpoint (Client Authorization)
-async function getUserToken(companyLogin, userLogin, userPassword) {
-  // Use the login endpoint explicitly for token retrieval
-  const loginUrl = `${process.env.SIMPLYBOOK_API_URL}/login`;
-
-  const params = {
-    companyLogin,
-    userLogin,
-    userPassword,
-  };
-
-  return await sendJsonRpcRequest("getUserToken", params, {}, loginUrl); // Send request to the /login endpoint to get the token
 }
 
 // Function to get booking details using the token and JSON-RPC
