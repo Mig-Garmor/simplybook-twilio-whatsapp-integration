@@ -3,7 +3,7 @@ import {
   shouldNotify,
   getBookingLocation,
   generateMD5Hash,
-} from "../utils/functions.js";
+} from "@utils/functions.js";
 
 //SimplyBook.me credentials
 const publicKey = process.env.SIMPLYBOOK_PUBLIC_KEY; // Your SimplyBook public key (API key)

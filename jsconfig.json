@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+      "baseUrl": ".", // This sets the root of the project
+      "paths": {
+        "@utils/*": ["utils/*"] // This is for mapping your utils directory to an alias
+      }
+    },
+    "include": ["./**/*"] // Ensures all files are included in the project
+  }
