@@ -5,55 +5,30 @@ const companyLogin = process.env.SIMPLYBOOK_COMPANY_LOGIN;
 const userLogin = process.env.SIMPLYBOOK_USER_LOGIN;
 const userPassword = process.env.SIMPLYBOOK_USER_PASSWORD;
 
-// Function to get bookings from exactly one month ago
-async function getBookingsFromExactMonthAgo(userToken, companyLogin) {
-  const adminEndpointUrl = `${process.env.SIMPLYBOOK_API_URL}/admin`;
+// Twilio configuration
+const twilioWhatsAppNumber = process.env.TWILIO_WHATSAPP_NUMBER;
+const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
 
-  // Get the current date and adjust it to one month ago
-  const currentDate = new Date();
-  const exactMonthAgoDate = new Date(currentDate);
-  exactMonthAgoDate.setMonth(currentDate.getMonth() - 1);
+// Twilio WhatsApp image URL
+const mediaUrl =
+  "https://planbbarber.simplybook.it/uploads/planbbarber/image_files/preview/45082ff229ebc86fefe79123d22a410e.jpeg";
 
-  // Format the date to YYYY-MM-DD for both from and to fields
-  const dateStr = exactMonthAgoDate.toISOString().split("T")[0];
-
-  const params = {
-    filter: {
-      date_from: dateStr, // Start and end date set to exactly one month ago
-      date_to: dateStr, // The same day
-    },
-  };
-
-  const headers = {
-    "X-Company-Login": companyLogin,
-    "X-User-Token": userToken,
-  };
-
-  return await sendJsonRpcRequest(
-    "getBookings",
-    params,
-    headers,
-    adminEndpointUrl
-  );
-}
-
-//DELETE - Function to get bookings from exactly one hour ago
+// Function to fetch bookings from exactly one hour ago
 async function getBookingsFromExactHourAgo(userToken, companyLogin) {
   const adminEndpointUrl = `${process.env.SIMPLYBOOK_API_URL}/admin`;
 
-  // Get the current date and adjust it to one hour ago
   const currentDate = new Date();
   const exactHourAgoDate = new Date(currentDate);
   exactHourAgoDate.setHours(currentDate.getHours() - 1);
 
-  // Format date and time to YYYY-MM-DDTHH:MM:SS (ISO format without milliseconds)
   const dateFromStr = exactHourAgoDate.toISOString().split(".")[0];
-  const dateToStr = dateFromStr; // Same start and end timestamp for exactly one hour ago
+  const dateToStr = dateFromStr; // Set both `date_from` and `date_to` to the same hour
 
   const params = {
     filter: {
-      date_from: dateFromStr, // Start date and time exactly one hour ago
-      date_to: dateToStr, // End date and time the same hour
+      date_from: dateFromStr,
+      date_to: dateToStr,
     },
   };
 
@@ -70,15 +45,45 @@ async function getBookingsFromExactHourAgo(userToken, companyLogin) {
   );
 }
 
-// Handler function for Vercel cron job
-export default async function handler(req) {
-  if (req.method === "GET") {
-    try {
-      console.log(
-        "Cron job triggered, fetching bookings from exactly one month ago..."
-      );
+// Function to send WhatsApp message using Twilio
+async function sendWhatsAppMessage(clientPhone, clientName) {
+  const encodedAuth = Buffer.from(
+    `${twilioAccountSid}:${twilioAuthToken}`
+  ).toString("base64");
 
-      // Step 1: Authenticate and get the user token
+  const url = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
+
+  const messageBody = `${clientName}, it's been one month since your last haircut. Book with us now and get a fresh haircut!`;
+
+  const params = new URLSearchParams({
+    Body: messageBody,
+    From: `whatsapp:${twilioWhatsAppNumber}`,
+    To: `whatsapp:${clientPhone}`,
+    MediaUrl: mediaUrl,
+  });
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${encodedAuth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params.toString(),
+    });
+
+    const data = await response.json();
+    console.log("WhatsApp message sent successfully: ", data.sid);
+  } catch (error) {
+    console.error("Error sending WhatsApp message: ", error);
+  }
+}
+
+// Main handler function for Vercel Edge Function
+export default async function handler(req) {
+  if (req.method === "POST") {
+    try {
+      console.log("Fetching user token...");
       const userToken = await getUserToken(
         companyLogin,
         userLogin,
@@ -86,30 +91,30 @@ export default async function handler(req) {
       );
       console.log("User Token received:", userToken);
 
-      // Step 2: Fetch bookings from exactly one month ago
-      //   const exactMonthAgoBookings = await getBookingsFromExactMonthAgo(
-      //     userToken,
-      //     companyLogin
-      //   );
-      //   console.log(
-      //     "Bookings from exactly one month ago: ",
-      //     exactMonthAgoBookings
-      //   );
-
-      const exactMonthAgoBookings = await getBookingsFromExactHourAgo(
+      // Step 1: Fetch bookings from exactly one hour ago
+      console.log("Fetching bookings from exactly one hour ago...");
+      const bookings = await getBookingsFromExactHourAgo(
         userToken,
         companyLogin
       );
-      console.log(
-        "Bookings from exactly one hour ago: ",
-        exactMonthAgoBookings
-      );
+      console.log("Bookings from exactly one hour ago: ", bookings);
 
-      // Return the bookings or perform other actions
+      // Step 2: Filter unique clients by phone number
+      const uniqueClients = {};
+      bookings.forEach((booking) => {
+        if (!uniqueClients[booking.client_phone]) {
+          uniqueClients[booking.client_phone] = booking.client;
+        }
+      });
+
+      // Step 3: Send WhatsApp message to each unique client
+      for (const [phone, name] of Object.entries(uniqueClients)) {
+        await sendWhatsAppMessage(phone, name);
+      }
+
       return new Response(
         JSON.stringify({
-          message: "Success",
-          bookings: exactMonthAgoBookings,
+          message: "Messages sent to unique clients",
         }),
         {
           status: 200,
