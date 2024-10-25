@@ -104,9 +104,15 @@ export default async function handler(req) {
       );
       console.log("Bookings from exactly one hour ago: ", bookings);
 
-      // Step 2: Filter unique clients by phone number
+      // Step 2.1: Filter out unconfirmed bookings (is_confirm === '0')
+      const confirmedBookings = bookings.filter(
+        (booking) => booking.is_confirm === "1"
+      );
+      console.log("Confirmed bookings: ", confirmedBookings);
+
+      // Step 2.2: Filter unique clients by phone number
       const uniqueClients = {};
-      bookings.forEach((booking) => {
+      confirmedBookings.forEach((booking) => {
         if (!uniqueClients[booking.client_phone]) {
           uniqueClients[booking.client_phone] = booking.client;
         }
