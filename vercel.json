@@ -1,7 +1,8 @@
 {
-  "functions": {
-    "api/handler.js": {
-      "runtime": "nodejs"
+  "crons": [
+    {
+      "path": "/api/every-minute",
+      "schedule": "* * * * *"
     }
-  }
+  ]
 }
