@@ -10,6 +10,9 @@ const publicKey = process.env.SIMPLYBOOK_PUBLIC_KEY; // Your SimplyBook public k
 const secretKey = process.env.SIMPLYBOOK_SECRET_KEY; // Your SimplyBook secret key
 const companyLogin = process.env.SIMPLYBOOK_COMPANY_LOGIN; // Your SimplyBook company login
 
+const userLogin = process.env.SIMPLYBOOK_USER_LOGIN; // Your SimplyBook user login
+const userPassword = process.env.SIMPLYBOOK_USER_PASSWORD; // Your SimplyBook user password
+
 // Twilio configuration
 const twilioWhatsAppNumber = process.env.TWILIO_WHATSAPP_NUMBER;
 const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -82,6 +85,20 @@ async function getToken(companyLogin, publicKey) {
   return await sendJsonRpcRequest("getToken", params, {}, loginUrl); // Send request to the /login endpoint to get the token
 }
 
+// Function to get the token using the login endpoint (Client Authorization)
+async function getUserToken(companyLogin, userLogin, userPassword) {
+  // Use the login endpoint explicitly for token retrieval
+  const loginUrl = `${process.env.SIMPLYBOOK_API_URL}/login`;
+
+  const params = {
+    companyLogin,
+    userLogin,
+    userPassword,
+  };
+
+  return await sendJsonRpcRequest("getUserToken", params, {}, loginUrl); // Send request to the /login endpoint to get the token
+}
+
 // Function to get booking details using the token and JSON-RPC
 async function getBookingDetails(
   bookingId,
@@ -112,7 +129,7 @@ async function getBookingDetails(
 // Function to get all bookings using the token and JSON-RPC
 async function getAllBookings(token, companyLogin) {
   // Admin endpoint
-  const adminEndpointUrl = `${process.env.SIMPLYBOOK_API_URL}/admin/bookings`;
+  const adminEndpointUrl = `${process.env.SIMPLYBOOK_API_URL}/admin`;
   // Define a basic filter object, which could be expanded as needed
   const params = {
     filter: {
@@ -239,6 +256,11 @@ export default async function handler(req) {
 
       // Step 1: Authenticate and get the token via JSON-RPC from the login endpoint
       const token = await getToken(companyLogin, publicKey);
+      const userToken = await getUserToken(
+        companyLogin,
+        userLogin,
+        userPassword
+      );
 
       console.log("Token received:", token);
 
@@ -252,7 +274,7 @@ export default async function handler(req) {
       );
 
       //DELETE
-      const allBookings = await getAllBookings(token, companyLogin);
+      const allBookings = await getAllBookings(userToken, companyLogin);
 
       console.log("ALL BOOKINGS: ", allBookings);
 
