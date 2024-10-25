@@ -9,8 +9,14 @@
   },
   "crons": [
     {
-      "path": "/api/recurring",
+      "path": "/api/recurring.js",
       "schedule": "7 9 * * *"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "api/handler.js"
     }
   ]
 }
