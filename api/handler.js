@@ -111,6 +111,8 @@ async function getBookingDetails(
 //DELETE
 // Function to get all bookings using the token and JSON-RPC
 async function getAllBookings(token, companyLogin) {
+  // Admin endpoint
+  const adminEndpointUrl = `${process.env.SIMPLYBOOK_API_URL}/admin`;
   // Define a basic filter object, which could be expanded as needed
   const params = {
     filter: {
@@ -125,7 +127,12 @@ async function getAllBookings(token, companyLogin) {
     "X-Token": token,
   };
 
-  return await sendJsonRpcRequest("getBookings", params, headers);
+  return await sendJsonRpcRequest(
+    "getBookings",
+    params,
+    headers,
+    adminEndpointUrl
+  );
 }
 
 // Function to send WhatsApp message using Twilio API directly with fetch
