@@ -111,13 +111,21 @@ async function getBookingDetails(
 //DELETE
 // Function to get all bookings using the token and JSON-RPC
 async function getAllBookings(token, companyLogin) {
+  // Define a basic filter object, which could be expanded as needed
+  const params = {
+    filter: {
+      // Example of minimum filter parameters, can be expanded based on requirements
+      date_from: "2024-01-01", // replace with an appropriate date or dynamic value
+      date_to: "2024-12-31", // replace with an appropriate date or dynamic value
+    },
+  };
   // Pass the token and company login as headers
   const headers = {
     "X-Company-Login": companyLogin,
     "X-Token": token,
   };
 
-  return await sendJsonRpcRequest("getBookings", {}, headers);
+  return await sendJsonRpcRequest("getBookings", params, headers);
 }
 
 // Function to send WhatsApp message using Twilio API directly with fetch
